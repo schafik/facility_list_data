@@ -1,4 +1,5 @@
 setwd("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning")
+library(digest)
 library(data.table)
 library(formhub)
 library(ggplot2)
@@ -35,7 +36,7 @@ p_index1 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_pr
                      stringsAsFactors=F)
 p_index2 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_15_11_21_54_p.csv",
                      stringsAsFactors=F)
-p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_18_10_44_00_p.csv",
+p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_22_11_31_56_p.csv",
                      stringsAsFactors=F)
 p_index1 <- p_index1[!(p_index1$mylga==""),]
 p_index3 <- p_index3[!(p_index3$mylga==""),]
@@ -53,7 +54,7 @@ schools1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/i
                          stringsAsFactors=F)
 schools2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_15_11_21_54_e.csv",
                          stringsAsFactors=F)
-schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_18_10_44_00_e.csv",
+schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_22_11_31_56_e.csv",
                          stringsAsFactors=F)
 
 # hospitals1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
@@ -63,7 +64,7 @@ hospitals1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning
                            stringsAsFactors=F)
 hospitals2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_15_11_21_54_h.csv",
                            stringsAsFactors=F)
-hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_18_10_44_00_h.csv",
+hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_22_11_31_56_h.csv",
                            stringsAsFactors=F)
 
 schools1 <- schools1_raw
@@ -179,18 +180,18 @@ write.csv(schools_total, "in_process_data/facility_lists/ossap updates/inprocess
 #education
 edu <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/outlier_cleaned/education_661_outliercleaned.csv",
                 stringsAsFactors=F)
-edu$public <- !(edu$school_managed %in% c('priv_noprofit', 'priv_noprofit', 'faith_org'))
-edu <- subset(edu, public == T)
+# edu$public <- !(edu$school_managed %in% c('priv_noprofit', 'priv_noprofit', 'faith_org'))
+# edu <- subset(edu, public == T)
 e_113 <- read.csv("in_process_data/facility_lists/raw data/113/Educ_Baseline_PhaseII_all_merged_cleaned_2011Nov16_without_emptyobs.csv",
                   stringsAsFactors=F)
-e_113$public <- !(e_113$school_managed_priv_profit == T | e_113$school_managed_priv_noprofit == T)
+# e_113$public <- !(e_113$school_managed_priv_profit == T | e_113$school_managed_priv_noprofit == T)
 e_113$uuid <- e_113$X_id
 e_pilot <- read.csv("in_process_data/facility_lists/raw data/113/Pilot_Education_cleaned_2011Oct4.csv",
                     stringsAsFactors=F)
-e_pilot$public <- T 
+# e_pilot$public <- T 
 e_pilot$uuid <- sapply(e_pilot$gps, FUN=digest)
 e_113 <- rbind.fill(e_113, e_pilot)
-e_113 <- subset(e_113, public==T)
+# e_113 <- subset(e_113, public==T)
 edu <- rbind.fill(e_113, edu)  
 edu <- subset(edu, select=c(X_lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
@@ -198,20 +199,20 @@ write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=
 #health
 health <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/outlier_cleaned/Health_661_outliercleaned.csv",
                    stringsAsFactors=F)
-health$public <- health$facility_owner_manager.federalgovernment | health$facility_owner_manager.stategovernment |
-  health$facility_owner_manager.lga
-health <- subset(health, public == T)
+# health$public <- health$facility_owner_manager.federalgovernment | health$facility_owner_manager.stategovernment |
+#   health$facility_owner_manager.lga
+# health <- subset(health, public == T)
 h_113 <- read.csv("in_process_data/facility_lists/raw data/113/Health_PhaseII_RoundI&II&III_Clean_2011.11.16.csv",
                   stringsAsFactors=F)
-h_113$public <- h_113$facility_owner_manager %in% c('federalgovernment', 'federalgovrenment', 'stategovernment', 'lga')
-h_113 <- subset(h_113, public==T)
+# h_113$public <- h_113$facility_owner_manager %in% c('federalgovernment', 'federalgovrenment', 'stategovernment', 'lga')
+# h_113 <- subset(h_113, public==T)
 h_113$uuid <- h_113$X_id 
 h_pilot <- read.csv("in_process_data/facility_lists/raw data/113/Pilot_Data_Hlth_Clean_2011.09.02.csv", stringsAsFactors=F)
-h_pilot$public <- h_pilot$facility_owner_manager %in% c('federalgovrenment', 'stategovernment', 'lga') 
-h_pilot <- subset(h_pilot, public==T)
+# h_pilot$public <- h_pilot$facility_owner_manager %in% c('federalgovrenment', 'stategovernment', 'lga') 
+# h_pilot <- subset(h_pilot, public==T)
 h_pilot$uuid <- sapply(h_pilot$geoid, FUN=digest)
 h_113 <- rbind.fill(h_113, h_pilot)
-h_113 <- subset(h_113, public==T)
+# h_113 <- subset(h_113, public==T)
 health <- rbind.fill(h_113, health)  
 health <- subset(health, select=c(X_lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
@@ -228,7 +229,7 @@ write.csv(e_total, "in_process_data/facility_lists/ossap updates/inprocess_data/
 #education
 baseline_total <- merge(lgas, e_total, by="X_lga_id", all.x=T)
 baseline_total <- rename(baseline_total, c("V1" = "baseline_facilitiy_count"))
-schools_total <- merge(lgas, schools_total, by.x="X_lga_id", by.y="lga_id", all.x=T) 
+schools_total <- merge(lgas, schools_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T) 
 schools_agg <- merge(baseline_total, schools_total, by="X_lga_id", all.x=F)
 schools_agg <- merge(schools_agg, subset(rural_urban, select=c("lga_id", "urban_rural")), by.x="X_lga_id", by.y="lga_id")
 names(schools_agg)[2] <- "lga"
@@ -239,7 +240,7 @@ schools_agg <- arrange(schools_agg, zone, state, lga)
 #hospital
 baseline_total_h <- merge(lgas, h_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T)
 baseline_total_h <- rename(baseline_total_h, c("V1" = "base_line_faciliti_count"))
-hospitals_total <- merge(lgas, hospitals_total, by.x="X_lga_id", by.y="lga_id", all.x=T)
+hospitals_total <- merge(lgas, hospitals_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T)
 hospitals_agg <- merge(baseline_total_h, hospitals_total, by="X_lga_id", all.y=T)
 hospitals_agg <- subset(hospitals_agg, select=c(X_lga_id, lga.x, state.x, zone.x, base_line_faciliti_count, facility_counts))
 names(hospitals_agg)[2] <- "lga"
