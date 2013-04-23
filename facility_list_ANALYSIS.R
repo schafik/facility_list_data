@@ -34,9 +34,9 @@ add_lga_id = function(df) {
 # p_index3 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=1)
 p_index1 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_16_17_47_16_p.csv",
                      stringsAsFactors=F)
-p_index2 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_15_11_21_54_p.csv",
+p_index2 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_23_12_07_22_p.csv",
                      stringsAsFactors=F)
-p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_22_11_31_56_p.csv",
+p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_23_12_08_14_p.csv",
                      stringsAsFactors=F)
 p_index1 <- p_index1[!(p_index1$mylga==""),]
 p_index3 <- p_index3[!(p_index3$mylga==""),]
@@ -52,9 +52,9 @@ p_index3 <- rename(p_index3, c("X_parent_index" = "X_pindex"))
 # schools3_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=2)
 schools1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_16_17_47_16_e.csv",
                          stringsAsFactors=F)
-schools2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_15_11_21_54_e.csv",
+schools2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_23_12_07_22_e.csv",
                          stringsAsFactors=F)
-schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_22_11_31_56_e.csv",
+schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_23_12_08_14_e.csv",
                          stringsAsFactors=F)
 
 # hospitals1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
@@ -62,9 +62,9 @@ schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/i
 # hospitals3_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=3)
 hospitals1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_16_17_47_16_h.csv",
                            stringsAsFactors=F)
-hospitals2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_15_11_21_54_h.csv",
+hospitals2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_23_12_07_22_h.csv",
                            stringsAsFactors=F)
-hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_22_11_31_56_h.csv",
+hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_23_12_08_14_h.csv",
                            stringsAsFactors=F)
 
 schools1 <- schools1_raw
@@ -164,6 +164,73 @@ hospitals <- subset(hospitals, select=c(lga_id, mylga_zone, mylga_state, mylga, 
                                         X_submission_time.y, start, end))
 hospitals <- arrange(hospitals, mylga_zone, mylga_state, mylga, HealthFacilities.health_facility_type)
 
+#CLEANING:test/non-character/blank facility names 
+ #education
+c_e1 <- schools[which(!str_detect(schools$Schools.school_name, '[a-zA-Z]')),]
+schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
+schools <- subset(schools, !Schools.school_name %in% c("", "1"))
+ #health
+c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.health_facility_name, '[a-zA-Z]')), ]
+hospitals <- subset(hospitals, !HealthFacilities.health_facility_name %in% c("", "00", "33")
+hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, '[*^]'),]
+hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "\'\'"),]
+hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "0000+"),]
+hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "ˆ +$"),]
+
+#CLEANING:duplicates                  
+first_value <- function(df)
+{
+  return(head(df,1))
+}       
+ #education
+c_e2 <- subset(schools, duplicated(schools[,1:12]) | duplicated(schools[,1:12], fromLast=T))
+c_e2 <- arrange(c_e2, mylga_zone, mylga_state, mylga, Schools.school_name)  
+schools <- ddply(schools, .(lga_id, mylga_zone, mylga_state, mylga, ta_name, 
+                      Schools.school_name, Schools.level_of_education, Schools.school_managed, 
+                      Schools.school_managed_other, Schools.ward_name, Schools.ward_num, 
+                      Schools.com_name), first_value)                                       
+ #health
+c_h2 <- subset(hospitals, duplicated(hospitals[,1:13]) | duplicated(hospitals[,1:13], fromLast=T))
+c_h2 <- arrange(c_h, mylga_zone, mylga_state, mylga, HealthFacilities.health_facility_name)  
+hospitals <- ddply(hospitals, .(lga_id, mylga_zone, mylga_state, mylga, ta_name, 
+                        HealthFacilities.health_facility_name, HealthFacilities.health_facility_type, 
+                        HealthFacilities.ward_name, HealthFacilities.com_name_h, 
+                        HealthFacilities.facility_owner_manager.federalgovernment, 
+                        HealthFacilities.facility_owner_manager.stategovernment, HealthFacilities.facility_owner_manager.lga, 
+                        HealthFacilities.facility_owner_manager.other), first_value)
+
+#ID:long id
+  #education
+test_e <- subset(schools, select=c(mylga, Schools.ward_name, 
+                                   Schools.ward_num, Schools.com_name, Schools.school_managed,
+                                   Schools.level_of_education, Schools.school_name, ta_name))
+test_e2 <- unique(test_e)
+schools$paste <- paste0(schools$mylga, schools$Schools.ward_name, 
+                        schools$Schools.ward_num, schools$Schools.com_name, schools$Schools.school_managed,
+                        schools$Schools.level_of_education, schools$Schools.school_name, schools$ta_name)
+schools$l_id <- sapply(schools$paste, FUN=digest)
+
+  #health
+test_h <- subset(hospitals, select=c(mylga, HealthFacilities.ward_name, HealthFacilities.health_facility_type, 
+                                     HealthFacilities.com_name_h,HealthFacilities.health_facility_name,
+                                     ta_name, HealthFacilities.facility_owner_manager.lga, 
+                                     HealthFacilities.facility_owner_manager.stategovernment,
+                                     HealthFacilities.facility_owner_manager.other))
+test_h2 <- unique(test_h)
+attach(hospitals)
+hospitals$paste <- paste0(mylga, HealthFacilities.ward_name, HealthFacilities.health_facility_type, 
+                          HealthFacilities.com_name_h,HealthFacilities.health_facility_name,
+                          ta_name, HealthFacilities.facility_owner_manager.lga, 
+                          HealthFacilities.facility_owner_manager.stategovernment,
+                          HealthFacilities.facility_owner_manager.other)
+detach(hospitals) 
+hospitals$l_id <- sapply(hospitals$paste, FUN=digest)      
+#ID:short id
+schools$s_id <- substr(schools$l_id, start=1, stop=9)
+#paste0(str_extract_all(schools$l_id[1:5000], '[a-zA-Z]+'))
+hospitals$s_id <- substr(hospitals$l_id, start=1, stop=7)
+                    #length(unique(hospitals$s_id)) for testing....
+                    
 ## WRITING OUT ## 
 write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F)
 write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F)
@@ -229,7 +296,7 @@ write.csv(e_total, "in_process_data/facility_lists/ossap updates/inprocess_data/
 #education
 baseline_total <- merge(lgas, e_total, by="X_lga_id", all.x=T)
 baseline_total <- rename(baseline_total, c("V1" = "baseline_facilitiy_count"))
-schools_total <- merge(lgas, schools_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T) 
+schools_total <- merge(lgas, schools_total, by.x="X_lga_id", by.y="lga_id", all.x=T) 
 schools_agg <- merge(baseline_total, schools_total, by="X_lga_id", all.x=F)
 schools_agg <- merge(schools_agg, subset(rural_urban, select=c("lga_id", "urban_rural")), by.x="X_lga_id", by.y="lga_id")
 names(schools_agg)[2] <- "lga"
@@ -240,7 +307,7 @@ schools_agg <- arrange(schools_agg, zone, state, lga)
 #hospital
 baseline_total_h <- merge(lgas, h_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T)
 baseline_total_h <- rename(baseline_total_h, c("V1" = "base_line_faciliti_count"))
-hospitals_total <- merge(lgas, hospitals_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T)
+hospitals_total <- merge(lgas, hospitals_total, by.x="X_lga_id", by.y="lga_id", all.x=T)
 hospitals_agg <- merge(baseline_total_h, hospitals_total, by="X_lga_id", all.y=T)
 hospitals_agg <- subset(hospitals_agg, select=c(X_lga_id, lga.x, state.x, zone.x, base_line_faciliti_count, facility_counts))
 names(hospitals_agg)[2] <- "lga"
@@ -255,9 +322,9 @@ write.csv(schools_agg, "in_process_data/facility_lists/summary_education.csv", r
 
 #### graphs
 ggplot(data=schools_agg, aes(x=baseline_facilitiy_count, y=facility_counts, label=lga)) + 
-  geom_point() + geom_abline(intercept=0, slope=1) + labs(title = "Education", x = "NMIS", y="Facility lists")
+  geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Education", x = "NMIS", y="Facility lists") + stat_smooth(method="lm")
 ggplot(data=hospitals_agg, aes(x=base_line_faciliti_count, y=facility_counts, label=lga)) +  
-  geom_point() + geom_abline(intercept=0, slope=1) + labs(title = "Health", x = "NMIS", y="Facility Lists")
+  geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Health", x = "NMIS", y="Facility Lists")
 
 ################
 ####more outputs
