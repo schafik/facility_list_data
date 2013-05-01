@@ -1,4 +1,5 @@
-setwd("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning")
+# setwd("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning")
+setwd("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning")
 library(digest)
 library(data.table)
 library(formhub)
@@ -7,11 +8,11 @@ library(doBy)
 library(gdata)
 library(plyr)
 "clean" = function(dt, cols, rows, value) {
-  if (any(rows)) {
-    set(dt, rows, cols, value) }}
+    if (any(rows)) {
+        set(dt, rows, cols, value) }}
 
 #related data
-rural_urban <- read.csv("~/Dropbox/Nigeria/Needs Assessment/data/population_Geo.csv")
+rural_urban <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Needs Assessment/data/population_Geo.csv")
 one48 <- read.csv("148lga_final_list.csv")
 lgas <- read.csv("lgas.csv")
 
@@ -19,12 +20,12 @@ lgas <- read.csv("lgas.csv")
 lga_corrections <- read.csv('in_process_data/nmis/nmis_lga_corrections.csv', stringsAsFactors=FALSE)
 nmis_lga_mapping <- read.csv('in_process_data/nmis/nmis_lga_mapping.csv', stringsAsFactors=FALSE)
 add_lga_id = function(df) {
-  df$unique_lga <- ifelse(df$mylga %in% c('ERROR', NA),
-                          NA,
-                          str_c(df$mylga_state, df$mylga, sep="_"))
-  df$unique_lga <- recodeVar(df$unique_lga, src=lga_corrections$orginal, tgt=lga_corrections$corrected)
-  df$lga_id <- as.numeric(recodeVar(as.character(df$unique_lga), src=nmis_lga_mapping$unique_slug, tgt=nmis_lga_mapping$id))
-  df
+    df$unique_lga <- ifelse(df$mylga %in% c('ERROR', NA),
+                            NA,
+                            str_c(df$mylga_state, df$mylga, sep="_"))
+    df$unique_lga <- recodeVar(df$unique_lga, src=lga_corrections$orginal, tgt=lga_corrections$corrected)
+    df$lga_id <- as.numeric(recodeVar(as.character(df$unique_lga), src=nmis_lga_mapping$unique_slug, tgt=nmis_lga_mapping$id))
+    df
 }
 ###############################
 ##importing/slicin/dicin data##
@@ -32,11 +33,11 @@ add_lga_id = function(df) {
 # p_index1 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=1)
 # p_index2 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=1)
 # p_index3 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=1)
-p_index1 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_p.csv",
+p_index1 <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_p.csv",
                      stringsAsFactors=F)
-p_index2 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
+p_index2 <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
                      stringsAsFactors=F)
-p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_30_10_03_29_p.csv",
+p_index3 <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_30_10_03_29_p.csv",
                      stringsAsFactors=F)
 p_index1 <- p_index1[!(p_index1$mylga==""),]
 p_index3 <- p_index3[!(p_index3$mylga==""),]
@@ -50,21 +51,21 @@ p_index3 <- rename(p_index3, c("X_parent_index" = "X_pindex"))
 # schools1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=2)
 # schools2_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=2)
 # schools3_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=2)
-schools1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_e.csv",
+schools1_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_e.csv",
                          stringsAsFactors=F)
-schools2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
+schools2_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
                          stringsAsFactors=F)
-schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_30_10_03_29_e.csv",
+schools3_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_30_10_03_29_e.csv",
                          stringsAsFactors=F)
 
 # hospitals1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
 # hospitals2_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=3)
 # hospitals3_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=3)
-hospitals1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_h.csv",
+hospitals1_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_h.csv",
                            stringsAsFactors=F)
-hospitals2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
+hospitals2_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
                            stringsAsFactors=F)
-hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_30_10_03_29_h.csv",
+hospitals3_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_30_10_03_29_h.csv",
                            stringsAsFactors=F)
 schools1 <- schools1_raw
 schools2 <- schools2_raw
@@ -75,42 +76,42 @@ hospitals3 <- hospitals3_raw
 
 ## reading in
 print_numbers <- function(where="") {
-  print(where)
-  print("Number of schools:")
-  print(paste(nrow(schools1), nrow(schools2), nrow(schools3)))
-  print("Number of health facilities:")
-  print(paste(nrow(hospitals1), nrow(hospitals2), nrow(hospitals3)))
-  print("Number of LGAs for education:")
-  print(length(levels(factor(c(as.character(schools1$mylga), as.character(schools2$mylga), as.character(schools3$mylga))))))
-  print("Number of LGAs for health:")
-  print(length(levels(factor(c(as.character(hospitals1$mylga), as.character(hospitals2$mylga), as.character(hospitals3$mylga))))))
+    print(where)
+    print("Number of schools:")
+    print(paste(nrow(schools1), nrow(schools2), nrow(schools3)))
+    print("Number of health facilities:")
+    print(paste(nrow(hospitals1), nrow(hospitals2), nrow(hospitals3)))
+    print("Number of LGAs for education:")
+    print(length(levels(factor(c(as.character(schools1$mylga), as.character(schools2$mylga), as.character(schools3$mylga))))))
+    print("Number of LGAs for health:")
+    print(length(levels(factor(c(as.character(hospitals1$mylga), as.character(hospitals2$mylga), as.character(hospitals3$mylga))))))
 }
 print_numbers2 <- function(where="") {
-  print(where)
-  print("Number of schools:")
-  print(paste(nrow(schools)))
-  print("Number of health facilities:")
-  print(paste(nrow(hospitals)))
-  print("Number of LGAs for education:")
-  print(length(levels(factor(c(as.character(schools$mylga))))))
-  print("Number of LGAs for health:")
-  print(length(levels(factor(c(as.character(hospitals$mylga))))))
+    print(where)
+    print("Number of schools:")
+    print(paste(nrow(schools)))
+    print("Number of health facilities:")
+    print(paste(nrow(hospitals)))
+    print("Number of LGAs for education:")
+    print(length(levels(factor(c(as.character(schools$mylga))))))
+    print("Number of LGAs for health:")
+    print(length(levels(factor(c(as.character(hospitals$mylga))))))
 }
 
 print_numbers("Just after reading")
 
 # rename child's X_index to uuid
 renameColumn <- function(df, oldname, newname) {
-  index = which(names(df) == oldname)
-  stopifnot(length(index) <= 1) # assumption: oldname only occurs once
-  names(df)[index] <- newname
-  df
+    index = which(names(df) == oldname)
+    stopifnot(length(index) <= 1) # assumption: oldname only occurs once
+    names(df)[index] <- newname
+    df
 }
 
 ## combine with the parent to pull in lga information, etc.
 merge_with_parent <- function(parentDF, childDF) {
-  childDF <- renameColumn(childDF, "X_index", "uuid")
-  merge(parentDF, childDF, by.x = "X_index", by.y="X_parent_index", all.y=T)
+    childDF <- renameColumn(childDF, "X_index", "uuid")
+    merge(parentDF, childDF, by.x = "X_index", by.y="X_parent_index", all.y=T)
 }
 schools1 <- merge_with_parent(p_index1, schools1)
 schools2 <- merge_with_parent(p_index2, schools2)
@@ -177,7 +178,7 @@ hospitals <- arrange(hospitals, mylga_zone, mylga_state, mylga, HealthFacilities
 
 #CLEANING:test/non-character/blank facility names
 print_numbers2("Before name cleaning")
- #education
+#education
 c_e1 <- schools[which(!str_detect(schools$Schools.school_name, '[a-zA-Z]')),]
 schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
 schools <- subset(schools, !Schools.school_name %in% c("", "1"))
@@ -187,7 +188,7 @@ schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xd
 schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xd3", "")
 schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xd4", "")
 schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xe7", "")
- #health
+#health
 c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.health_facility_name, '[a-zA-Z]')), ]
 hospitals <- subset(hospitals, !HealthFacilities.health_facility_name %in% c("", "00", "33"))
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, '[*^]'),]
@@ -202,29 +203,29 @@ print_numbers2("After name cleaning")
 #CLEANING:duplicates                  
 first_value <- function(df)
 {
-  return(head(df,1))
+    return(head(df,1))
 }     
- #education
+#education
 c_e2 <- subset(schools, duplicated(schools[,1:12]) | duplicated(schools[,1:12], fromLast=T))
 c_e2 <- arrange(c_e2, mylga_zone, mylga_state, mylga, Schools.school_name)  
 schools <- ddply(schools, .(lga_id, mylga_zone, mylga_state, mylga, ta_name, 
-                      Schools.school_name, Schools.level_of_education, Schools.school_managed, 
-                      Schools.school_managed_other, Schools.ward_name, Schools.ward_num, 
-                      Schools.com_name), first_value)                                       
- #health
+                            Schools.school_name, Schools.level_of_education, Schools.school_managed, 
+                            Schools.school_managed_other, Schools.ward_name, Schools.ward_num, 
+                            Schools.com_name), first_value)                                       
+#health
 c_h2 <- subset(hospitals, duplicated(hospitals[,1:13]) | duplicated(hospitals[,1:13], fromLast=T))
 c_h2 <- arrange(c_h2, mylga_zone, mylga_state, mylga, HealthFacilities.health_facility_name)  
 hospitals <- ddply(hospitals, .(lga_id, mylga_zone, mylga_state, mylga, ta_name, 
-                        HealthFacilities.health_facility_name, HealthFacilities.health_facility_type, 
-                        HealthFacilities.ward_name, HealthFacilities.com_name_h, 
-                        HealthFacilities.facility_owner_manager.federalgovernment, 
-                        HealthFacilities.facility_owner_manager.stategovernment, HealthFacilities.facility_owner_manager.lga, 
-                        HealthFacilities.facility_owner_manager.other), first_value)
+                                HealthFacilities.health_facility_name, HealthFacilities.health_facility_type, 
+                                HealthFacilities.ward_name, HealthFacilities.com_name_h, 
+                                HealthFacilities.facility_owner_manager.federalgovernment, 
+                                HealthFacilities.facility_owner_manager.stategovernment, HealthFacilities.facility_owner_manager.lga, 
+                                HealthFacilities.facility_owner_manager.other), first_value)
 print_numbers2("After duplicate cleaning")
 
 #ID:random character id
-  #education
-  id_generate <- function(df) { 
+#education
+id_generate <- function(df) { 
     l <- letters
     set.seed(1)
     x1 <- l[sample(1:26, dim(df)[1], replace=T)]
@@ -234,76 +235,66 @@ print_numbers2("After duplicate cleaning")
     x5 <- l[sample(1:26, dim(df)[1], replace=T)]
     df$random_id <- paste0(x1, x2, x3, x4, x5)
     return(df) }    
-  schools <- id_generate(schools)
-      #This is for tesing if the random_id is unique within each lga
-      #If output is "integer(0)" then we're good
-      t <- ddply(schools, .(lga_id), summarise, 
-             unique_short_id = length(unique(random_id)), 
-             n_fac = length(random_id))
-      which(t$unique_short_id != t$n_fac)
-  #health
-  id_generate <- function(df) { 
-    l <- letters
-    set.seed(1)
-    x1 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x2 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x3 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x4 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x5 <- l[sample(1:26, dim(df)[1], replace=T)]
-    df$random_id <- paste0(x1, x2, x3, x4, x5)
-    return(df) }    
-  hospitals <- id_generate(hospitals)
-  #This is for tesing if the random_id is unique within each lga
-  #If output is "integer(0)" then we're good
-  t <- ddply(hospitals, .(lga_id), summarise, 
-             unique_short_id = length(unique(random_id)), 
-             n_fac = length(random_id))
-  which(t$unique_short_id != t$n_fac)
+schools <- id_generate(schools)
+#This is for tesing if the random_id is unique within each lga
+#If output is "integer(0)" then we're good
+t <- ddply(schools, .(lga_id), summarise, 
+           unique_short_id = length(unique(random_id)), 
+           n_fac = length(random_id))
+which(t$unique_short_id != t$n_fac)
+#health
+hospitals <- id_generate(hospitals)
+#This is for tesing if the random_id is unique within each lga
+#If output is "integer(0)" then we're good
+t <- ddply(hospitals, .(lga_id), summarise, 
+           unique_short_id = length(unique(random_id)), 
+           n_fac = length(random_id))
+which(t$unique_short_id != t$n_fac)
 
 #ID:sequential IDs
-  #education
-    #order by lga_id  and submition time
-    schools <- arrange(schools, lga_id, end)
-    #Create serial from 1 to number of records in that lga
-    schools <- ddply(schools, .(lga_id), transform, 
-                           seq_id = 1:length(lga_id))
-    #adding leading "0"s 
-    idx <- which(sapply(schools$seq_id, nchar) == 1)
-    schools$seq_id[idx] <- paste0("00", schools$seq_id[idx])
-    idx <- which(sapply(schools$seq_id, nchar) == 2)
-    schools$seq_id[idx] <- paste0("0", schools$seq_id[idx])
-    #adding the leading character
-    schools$seq_id <- paste0("F", df$seq_id)
-  #health
-    #order by lga_id  and submition time
-    hospitals <- arrange(hospitals, lga_id, end)
-    #Create serial from 1 to number of records in that lga
-    hospitals <- ddply(hospitals, .(lga_id), transform, 
-                     seq_id = 1:length(lga_id))
-    #adding leading "0"s 
-    idx <- which(sapply(hospitals$seq_id, nchar) == 1)
-    hospitals$seq_id[idx] <- paste0("00", hospitals$seq_id[idx])
-    idx <- which(sapply(hospitals$seq_id, nchar) == 2)
-    hospitals$seq_id[idx] <- paste0("0", hospitals$seq_id[idx])
-    #adding the leading character
-    hospitals$seq_id <- paste0("F", df$seq_id)
+#education
+#order by lga_id  and submition time
+schools <- arrange(schools, lga_id, end)
+#Create serial from 1 to number of records in that lga
+schools <- ddply(schools, .(lga_id), transform, 
+                 seq_id = 1:length(lga_id))
+#adding leading "0"s 
+idx <- which(sapply(schools$seq_id, nchar) == 1)
+schools$seq_id[idx] <- paste0("00", schools$seq_id[idx])
+idx <- which(sapply(schools$seq_id, nchar) == 2)
+schools$seq_id[idx] <- paste0("0", schools$seq_id[idx])
+#adding the leading character
+schools$seq_id <- paste0("FE", schools$seq_id)
+#health
+#order by lga_id  and submition time
+hospitals <- arrange(hospitals, lga_id, end)
+#Create serial from 1 to number of records in that lga
+hospitals <- ddply(hospitals, .(lga_id), transform, 
+                   seq_id = 1:length(lga_id))
+#adding leading "0"s 
+idx <- which(sapply(hospitals$seq_id, nchar) == 1)
+hospitals$seq_id[idx] <- paste0("00", hospitals$seq_id[idx])
+idx <- which(sapply(hospitals$seq_id, nchar) == 2)
+hospitals$seq_id[idx] <- paste0("0", hospitals$seq_id[idx])
+#adding the leading character
+hospitals$seq_id <- paste0("FH", hospitals$seq_id)
 
 ## WRITING OUT ## 
 #making tidy...
 schools$paste <- NULL
 hospitals$paste <- NULL
- #zaiming cleaning
-  #education
-  index <- which(is.na(schools$Schools.ward_num) & !is.na(schools$Schools.ward_name))
-  schools$Schools.ward_num[index] <- schools$Schools.ward_name[index]
-  rm(index)
-  schools$Schools.ward_name <- NULL
-  
-  ward_comm_fix_edu_f <- function(df, ward_col, comunity_col)
-  {
-        ward_col <- "Schools.ward_num"
-        comunity_col <- "Schools.com_name"
-        df <- schools
+#zaiming cleaning
+#education
+index <- which(is.na(schools$Schools.ward_num) & !is.na(schools$Schools.ward_name))
+schools$Schools.ward_num[index] <- schools$Schools.ward_name[index]
+rm(index)
+schools$Schools.ward_name <- NULL
+
+ward_comm_fix_edu_f <- function(df, ward_col, comunity_col)
+{
+    #    ward_col <- "Schools.ward_num"
+    #    comunity_col <- "Schools.com_name"
+    #    df <- schools
     # Take out "ward"
     df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
     # trim off leading & tailing blanks
@@ -314,28 +305,28 @@ hospitals$paste <- NULL
     # replace consecutive blanks with only one blank
     df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
     df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-        return(df)
-  } 
-    facility_name_fix_edu_f <- function(df, school_name_col)
-    {
-          df <- schools
-          school_name_col <- "Schools.school_name" 
-      df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
-      df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
-      df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
-      df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
-      df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
-      df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
-      df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
-          return(df)
-    }
+    return(df)
+} 
+facility_name_fix_edu_f <- function(df, school_name_col)
+{
+    #     df <- schools
+    #     school_name_col <- "Schools.school_name" 
+    df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
+    return(df)
+}
 
-  #health 
-  ward_comm_fix_health_f <- function(df, ward_col, comunity_col)
-  {
-    ward_col <- "HealthFacilities.ward_name"
-    comunity_col <- "HealthFacilities.com_name_h"
-    df <- hospitals
+#health 
+ward_comm_fix_health_f <- function(df, ward_col, comunity_col)
+{
+    #ward_col <- "HealthFacilities.ward_name"
+    #comunity_col <- "HealthFacilities.com_name_h"
+    #df <- hospitals
     # Take out "ward"
     df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
     # find row.name for those com == NA & ward contain (",", "/")
@@ -352,26 +343,26 @@ hospitals$paste <- NULL
     df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
     df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
     return(df)
-  } 
-    facility_name_fix_health_f <- function(df, facility_name_col)
-    {
-          df <- hospitals
-          facility_name_col <- "HealthFacilities.health_facility_name"  
-      df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
-          return(df)
-    }
+} 
+facility_name_fix_health_f <- function(df, facility_name_col)
+{
+    #    df <- hospitals
+    #    facility_name_col <- "HealthFacilities.health_facility_name"  
+    df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
+    return(df)
+}
 
 schools <- rename(schools, c("Schools.school_name" = "facility_name"))
 schools <- rename(schools, c("Schools.level_of_education" = "facility_type"))
@@ -391,6 +382,19 @@ hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.lga" =
 hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.other" = "facility_owner_other"))
 hospitals <- rename(hospitals, c("X_submission_time.x" = "X_submission_time_x"))
 hospitals <- rename(hospitals, c("X_submission_time.y" = "X_submission_time_y"))
+
+#Name spelling standardization
+
+
+names(hospitals)
+
+hospitals <- ward_comm_fix_health_f(hospitals, 'ward', 'community')
+hospitals <- facility_name_fix_health_f(df=hospitals, facility_name_col= 'facility_name')
+
+names(schools)
+schools <- ward_comm_fix_edu_f(df=schools, ward_col='ward', comunity_col='community')
+schools <- facility_name_fix_edu_f(df=schools, school_name_col= 'facility_name')
+
 #writing
 write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F)
 write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F)
@@ -405,7 +409,7 @@ write.csv(schools_total, "in_process_data/facility_lists/ossap updates/inprocess
 #######baseline####### 
 ######################
 #education
-edu <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/outlier_cleaned/education_661_outliercleaned.csv",
+edu <- read.csv("C:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/outlier_cleaned/education_661_outliercleaned.csv",
                 stringsAsFactors=F)
 # edu$public <- !(edu$school_managed %in% c('priv_noprofit', 'priv_noprofit', 'faith_org'))
 # edu <- subset(edu, public == T)
@@ -423,7 +427,7 @@ edu <- rbind.fill(e_113, edu)
 edu <- subset(edu, select=c(X_lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 
 #health
-health <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/outlier_cleaned/Health_661_outliercleaned.csv",
+health <- read.csv("C:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/outlier_cleaned/Health_661_outliercleaned.csv",
                    stringsAsFactors=F)
 # health$public <- health$facility_owner_manager.federalgovernment | health$facility_owner_manager.stategovernment |
 #   health$facility_owner_manager.lga
@@ -441,75 +445,85 @@ h_113 <- rbind.fill(h_113, h_pilot)
 # h_113 <- subset(h_113, public==T)
 health <- rbind.fill(h_113, health)  
 health <- subset(health, select=c(X_lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
- #zaiming cleaning
-  #education
-    ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
-    {
-          ward_col <- "ward"
-          comunity_col <- "community"
-          df <- edu   
-      # Take out "ward"
-      df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
-      # trim off leading & tailing blanks
-      df[, ward_col] <- str_trim(df[, ward_col])
-      df[, comunity_col] <- str_trim(df[, comunity_col])
-      # trim off "0" in front of 01,02 & etc
-      df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
-      # replace consecutive blanks with only one blank
-      df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
-      df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-          return(df)
-    } 
-      facility_name_fix_edu_b <- function(df, school_name_col)
-      {
-            df <- edu
-            school_name_col <- "school_name"     
-        df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
-            return(df)
-      }
-  #health
-    ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
-    {
-          ward_col <- "ward"
-          comunity_col <- "community"
-          df <- health
-      # Take out "ward"
-      df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
-      # trim off leading & tailing blanks
-      df[, ward_col] <- str_trim(df[, ward_col])
-      df[, comunity_col] <- str_trim(df[, comunity_col])
-      # trim off "0" in front of 01,02 & etc
-      df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
-      # replace consecutive blanks with only one blank
-      df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
-      df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-          return(df)
-    } 
-    facility_name_fix_health_b <- function(df, facility_name_col)
-    {
-          df <- health
-          facility_name_col <- "facility_name"     
-      df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
-      df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
-          return(df)
-    }
+#zaiming cleaning
+#education
+ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
+{
+    #ward_col <- "ward"
+    #comunity_col <- "community"
+    #df <- edu   
+    # Take out "ward"
+    df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
+    # trim off leading & tailing blanks
+    df[, ward_col] <- str_trim(df[, ward_col])
+    df[, comunity_col] <- str_trim(df[, comunity_col])
+    # trim off "0" in front of 01,02 & etc
+    df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
+    # replace consecutive blanks with only one blank
+    df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
+    df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
+    return(df)
+} 
+facility_name_fix_edu_b <- function(df, school_name_col)
+{
+#     df <- edu
+#     school_name_col <- "school_name"     
+    df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
+    return(df)
+}
+#health
+ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
+{
+#     ward_col <- "ward"
+#     comunity_col <- "community"
+#     df <- health
+    # Take out "ward"
+    df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
+    # trim off leading & tailing blanks
+    df[, ward_col] <- str_trim(df[, ward_col])
+    df[, comunity_col] <- str_trim(df[, comunity_col])
+    # trim off "0" in front of 01,02 & etc
+    df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
+    # replace consecutive blanks with only one blank
+    df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
+    df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
+    return(df)
+} 
+facility_name_fix_health_b <- function(df, facility_name_col)
+{
+#     df <- health
+#     facility_name_col <- "facility_name"     
+    df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
+    return(df)
+}
+
+edu <- facility_name_fix_edu_b(df=edu, school_name_col="school_name")
+edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
+
+names(health)
+
+health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
+health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
+
+
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
 
@@ -551,9 +565,9 @@ write.csv(schools_agg, "in_process_data/facility_lists/summary_education.csv", r
 
 #### graphs
 ggplot(data=schools_agg, aes(x=baseline_facilitiy_count, y=facility_counts, label=lga)) + 
-  geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Education", x = "NMIS", y="Facility lists") + stat_smooth(method="lm")
+    geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Education", x = "NMIS", y="Facility lists") + stat_smooth(method="lm")
 ggplot(data=hospitals_agg, aes(x=base_line_faciliti_count, y=facility_counts, label=lga)) +  
-  geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Health", x = "NMIS", y="Facility Lists") + stat_smooth(method="lm")
+    geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Health", x = "NMIS", y="Facility Lists") + stat_smooth(method="lm")
 
 ################
 ####more outputs
@@ -594,4 +608,3 @@ ggplot(data=hospitals_agg, aes(x=base_line_faciliti_count, y=facility_counts, la
 #       nrow(subset(schools_agg, facility_counts > baseLine_total)))
 # paste("Number of Health facility lists with at least the number of facilities as baseline:", 
 #       nrow(subset(hospitals_agg, facility_counts > base_line_faciliti_count)))
-
