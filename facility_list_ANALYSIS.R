@@ -251,6 +251,9 @@ t <- ddply(hospitals, .(lga_id), summarise,
            n_fac = length(random_id))
 which(t$unique_short_id != t$n_fac)
 
+#ID:assigning new data from refresh character id
+##merge, rbind fill etc. etc. 
+
 #ID:sequential IDs
 #education
 #order by lga_id  and submition time
@@ -317,7 +320,6 @@ hospitals$seq_id <- paste0("FH", hospitals$seq_id)
         df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
         return(df)
     }
-    
     #health 
     ward_comm_fix_health_f <- function(df, ward_col, comunity_col)
     {
@@ -367,20 +369,24 @@ schools <- rename(schools, c("Schools.school_managed" = "school_managed"))
 schools <- rename(schools, c("Schools.school_managed_other" = "school_managed_other"))
 schools <- rename(schools, c("Schools.ward_num" = "ward"))
 schools <- rename(schools, c("Schools.com_name" = "community"))
-schools <- rename(schools, c("X_submission_time.x" = "X_submission_time_x"))
-schools <- rename(schools, c("X_submission_time.y" = "X_submission_time_y"))      
+schools <- rename(schools, c("mylga_zone" = "zone"))
+schools <- rename(schools, c("mylga_state" = "state"))
+schools <- rename(schools, c("mylga" = "lga"))
 hospitals <- rename(hospitals, c("HealthFacilities.health_facility_name" = "facility_name"))
 hospitals <- rename(hospitals, c("HealthFacilities.health_facility_type" = "facility_type"))
 hospitals <- rename(hospitals, c("HealthFacilities.ward_name" = "ward"))
 hospitals <- rename(hospitals, c("HealthFacilities.com_name_h" = "community"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.federalgovernment" = "facility_owner_federalgov"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.stategovernment" = "facility_owner_stategov"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.lga" = "facility_owner_lgagov"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.other" = "facility_owner_other"))
-hospitals <- rename(hospitals, c("X_submission_time.x" = "X_submission_time_x"))
-hospitals <- rename(hospitals, c("X_submission_time.y" = "X_submission_time_y"))
+hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.federalgovernment" = "fed_gov"))
+hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.stategovernment" = "state_gov"))
+hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.lga" = "lga_gov"))
+hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.other" = "private"))
+hospitals <- rename(hospitals, c("mylga_zone" = "zone"))
+hospitals <- rename(hospitals, c("mylga_state" = "state"))
+hospitals <- rename(hospitals, c("mylga" = "lga"))
 
 #writing
+schools <- subset(schools, select=c(-start, -end, -X_submission_time.x, -X_submission_time.y))
+hospitals <- subset(hospitals, select=c(-start, -end, -X_submission_time.x, -X_submission_time.y))
 write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F)
 write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F)
 
@@ -501,12 +507,9 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     return(df)
 }
 
-names(edu)
-edu <- facility_name_fix_edu_b(df=edu, school_name_col="facility_name")
-edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
-names(health)
-health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
-health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
+#writing
+schools <- rename(schools, c("mylga" = "lga"))
+hospitals <- rename(hospitals, c("mylga" = "lga"))
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
 
