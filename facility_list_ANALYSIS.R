@@ -251,36 +251,41 @@ t <- ddply(hospitals, .(lga_id), summarise,
            n_fac = length(random_id))
 which(t$unique_short_id != t$n_fac)
 
-#ID:assigning new data from refresh character id
-##merge, rbind fill etc. etc. 
+##ID:assigning new data from refresh character ID
+#reading in facilities that already have ID 
+old_schools <- read.csv("in_process_data/facility_lists/FACILITY_LIST_schools.csv")
+old_hospitals <- read.csv("in_process_data/facility_lists/FACILITY_LIST_hospitals.csv")
+#merge  
+  #... <- merge(old_schools, schools, ....)
+  #... <- merge(old_hospitals, hospitals, ....)
 
-#ID:sequential IDs
-#education
-#order by lga_id  and submition time
-schools <- arrange(schools, lga_id, end)
-#Create serial from 1 to number of records in that lga
-schools <- ddply(schools, .(lga_id), transform, 
-                 seq_id = 1:length(lga_id))
-#adding leading "0"s 
-idx <- which(sapply(schools$seq_id, nchar) == 1)
-schools$seq_id[idx] <- paste0("00", schools$seq_id[idx])
-idx <- which(sapply(schools$seq_id, nchar) == 2)
-schools$seq_id[idx] <- paste0("0", schools$seq_id[idx])
-#adding the leading character
-schools$seq_id <- paste0("FE", schools$seq_id)
-#health
-#order by lga_id  and submition time
-hospitals <- arrange(hospitals, lga_id, end)
-#Create serial from 1 to number of records in that lga
-hospitals <- ddply(hospitals, .(lga_id), transform, 
-                   seq_id = 1:length(lga_id))
-#adding leading "0"s 
-idx <- which(sapply(hospitals$seq_id, nchar) == 1)
-hospitals$seq_id[idx] <- paste0("00", hospitals$seq_id[idx])
-idx <- which(sapply(hospitals$seq_id, nchar) == 2)
-hospitals$seq_id[idx] <- paste0("0", hospitals$seq_id[idx])
-#adding the leading character
-hospitals$seq_id <- paste0("FH", hospitals$seq_id)
+# ##ID:sequential IDs
+# #education
+# #order by lga_id  and submition time
+# schools <- arrange(schools, lga_id, end)
+# #Create serial from 1 to number of records in that lga
+# schools <- ddply(schools, .(lga_id), transform, 
+#                  seq_id = 1:length(lga_id))
+# #adding leading "0"s 
+# idx <- which(sapply(schools$seq_id, nchar) == 1)
+# schools$seq_id[idx] <- paste0("00", schools$seq_id[idx])
+# idx <- which(sapply(schools$seq_id, nchar) == 2)
+# schools$seq_id[idx] <- paste0("0", schools$seq_id[idx])
+# #adding the leading character
+# schools$seq_id <- paste0("FE", schools$seq_id)
+# #health
+# #order by lga_id  and submition time
+# hospitals <- arrange(hospitals, lga_id, end)
+# #Create serial from 1 to number of records in that lga
+# hospitals <- ddply(hospitals, .(lga_id), transform, 
+#                    seq_id = 1:length(lga_id))
+# #adding leading "0"s 
+# idx <- which(sapply(hospitals$seq_id, nchar) == 1)
+# hospitals$seq_id[idx] <- paste0("00", hospitals$seq_id[idx])
+# idx <- which(sapply(hospitals$seq_id, nchar) == 2)
+# hospitals$seq_id[idx] <- paste0("0", hospitals$seq_id[idx])
+# #adding the leading character
+# hospitals$seq_id <- paste0("FH", hospitals$seq_id)
 
 ## WRITING OUT ## 
   #zaiming cleaning
@@ -365,9 +370,9 @@ hospitals$seq_id <- paste0("FH", hospitals$seq_id)
 
 schools <- rename(schools, c("Schools.school_name" = "facility_name"))
 schools <- rename(schools, c("Schools.level_of_education" = "facility_type"))
-schools <- rename(schools, c("Schools.school_managed" = "school_managed"))
-schools <- rename(schools, c("Schools.school_managed_other" = "school_managed_other"))
+schools <- rename(schools, c("school_managed" = "managed_by"))
 schools <- rename(schools, c("Schools.ward_num" = "ward"))
+schools <- rename(schools, c("Schools.ward_name" = "ward_name"))
 schools <- rename(schools, c("Schools.com_name" = "community"))
 schools <- rename(schools, c("mylga_zone" = "zone"))
 schools <- rename(schools, c("mylga_state" = "state"))
@@ -385,8 +390,9 @@ hospitals <- rename(hospitals, c("mylga_state" = "state"))
 hospitals <- rename(hospitals, c("mylga" = "lga"))
 
 #writing
-schools <- subset(schools, select=c(-start, -end, -X_submission_time.x, -X_submission_time.y))
-hospitals <- subset(hospitals, select=c(-start, -end, -X_submission_time.x, -X_submission_time.y))
+schools <- subset(schools, select=c(-start, -end, -X_submission_time.x, -today,
+                                    -X_submission_time.y, -Schools.school_managed_other, -ta_name))
+hospitals <- subset(hospitals, select=c(-start, -end, -X_submission_time.x, -X_submission_time.y, -ta_name, -today))
 write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F)
 write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F)
 
@@ -508,14 +514,18 @@ facility_name_fix_health_b <- function(df, facility_name_col)
 }
 
 #writing
-schools <- rename(schools, c("mylga" = "lga"))
-hospitals <- rename(hospitals, c("mylga" = "lga"))
+edu <- rename(edu, c("X_lga_id" = "lga_id"))
+edu <- rename(edu, c("school_name" = "facility_name"))
+edu <- rename(edu, c("uuid" = "random_id"))
+edu <- rename(edu, c("level_of_education" = "facility_type"))
+health <- rename(health, c("X_lga_id" = "lga_id"))
+health <- rename(health, c("uuid" = "random_id"))
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
 
 ## AGGREGATION BY LGA: baseline
-h_total <- ddply(health, .(X_lga_id), nrow)
-e_total <- ddply(edu, .(X_lga_id), nrow)
+h_total <- ddply(health, .(lga_id), nrow)
+e_total <- ddply(edu, .(lga_id), nrow)
 write.csv(h_total, "in_process_data/facility_lists/ossap updates/inprocess_data/b_agg_h.csv", row.names=F)
 write.csv(e_total, "in_process_data/facility_lists/ossap updates/inprocess_data/b_agg_e.csv", row.names=F)
 
@@ -523,7 +533,7 @@ write.csv(e_total, "in_process_data/facility_lists/ossap updates/inprocess_data/
 #######merging####### 
 ######################
 #education
-baseline_total <- merge(lgas, e_total, by="X_lga_id", all.x=T)
+baseline_total <- merge(lgas, e_total, by.x="X_lga_id", by.y="lga_id", all.x=T)
 baseline_total <- rename(baseline_total, c("V1" = "baseline_facilitiy_count"))
 schools_total <- merge(lgas, schools_total, by.x="X_lga_id", by.y="lga_id", all.x=T) 
 schools_agg <- merge(baseline_total, schools_total, by="X_lga_id", all.x=F)
@@ -534,7 +544,7 @@ names(schools_agg)[4] <- "zone"
 schools_agg <- subset(schools_agg, select=c(X_lga_id, lga, state, zone, baseline_facilitiy_count, facility_counts, urban_rural))
 schools_agg <- arrange(schools_agg, zone, state, lga)
 #hospital
-baseline_total_h <- merge(lgas, h_total, by.x="X_lga_id", by.y="X_lga_id", all.x=T)
+baseline_total_h <- merge(lgas, h_total, by.x="X_lga_id", by.y="lga_id", all.x=T)
 baseline_total_h <- rename(baseline_total_h, c("V1" = "base_line_faciliti_count"))
 hospitals_total <- merge(lgas, hospitals_total, by.x="X_lga_id", by.y="lga_id", all.x=T)
 hospitals_agg <- merge(baseline_total_h, hospitals_total, by="X_lga_id", all.y=T)
