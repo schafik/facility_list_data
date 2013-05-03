@@ -418,8 +418,8 @@ schools <- facility_name_fix_edu_f(df=schools, school_name_col= 'facility_name')
 #writing
 schools <- subset(schools, select=c(-ta_name))
 hospitals <- subset(hospitals, select=c(-ta_name))
-write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F)
-write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F)
+write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F, quote=F)
+write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F, quote=F)
 
 ## AGGREGATION BY LGA: facility lists
 schools_total <- ddply(schools, .(lga_id), summarize, facility_counts=length(lga_id))
@@ -574,8 +574,8 @@ edu <- rename(edu, c("uuid" = "long_id"))
 edu <- rename(edu, c("level_of_education" = "facility_type"))
 health <- rename(health, c("X_lga_id" = "lga_id"))
 health <- rename(health, c("uuid" = "long_id"))
-write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
-write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
+write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F, quote=F)
+write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F, quote=F)
 
 ## AGGREGATION BY LGA: baseline
 h_total <- ddply(health, .(lga_id), nrow)
