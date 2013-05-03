@@ -205,6 +205,36 @@ c_h2 <- arrange(c_h2, mylga_zone, mylga_state, mylga, HealthFacilities.health_fa
 hospitals <- subset(hospitals, !duplicated(hospitals[,1:10]))
 print_numbers2("After duplicate cleaning")
 
+#ID:long_id
+#education
+test_e <- subset(schools, select=c(mylga, Schools.ward_name, 
+                                   Schools.ward_num, Schools.com_name, Schools.school_managed,
+                                   Schools.level_of_education, Schools.school_name, ta_name))
+# IF THE OUTPUT IS NOT 0, something is wrong
+nrow(test_e) - nrow(unique(test_e))
+schools$paste <- paste0(schools$mylga, schools$Schools.ward_name, 
+                        schools$Schools.ward_num, schools$Schools.com_name, schools$Schools.school_managed,
+                        schools$Schools.level_of_education, schools$Schools.school_name, schools$ta_name)
+schools$long_id <- sapply(schools$paste, FUN=digest)
+schools$paste <- NULL
+#health
+test_h <- subset(hospitals, select=c(mylga,  ta_name, HealthFacilities.health_facility_name,
+                                     HealthFacilities.health_facility_type, HealthFacilities.ward_name, 
+                                     HealthFacilities.com_name_h, managed_by))
+# IF THE OUTPUT IS NOT 0, something is wrong
+nrow(test_h) - nrow(unique(test_h))
+attach(hospitals)
+hospitals$paste <- paste0(mylga, HealthFacilities.ward_name, HealthFacilities.health_facility_type, 
+                          HealthFacilities.com_name_h,HealthFacilities.health_facility_name,
+                          ta_name, managed_by)
+detach(hospitals) 
+hospitals$long_id <- sapply(hospitals$paste, FUN=digest)      
+hospitals$paste <- NULL
+
+# IF THE OUTPUT IS NOT 0, something is wrong
+nrow(hospitals) - length(unique(hospitals$long_id)) 
+nrow(schools) - length(unique(schools$long_id)) 
+
 
 #ID:random character id
 #education
