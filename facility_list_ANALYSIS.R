@@ -148,23 +148,25 @@ schools <- rbind.fill(schools1, schools2, schools3)
 hospitals <- rbind.fill(hospitals1, hospitals2, hospitals3)
 print_numbers2("After Joining")
 
+# MANAGED BY FOR HOSPITALS
+hospitals$managed_by <- 
+  ifelse(hospitals$HealthFacilities.facility_owner_manager.federalgovernment, 'fed_gov',
+    ifelse(hospitals$HealthFacilities.facility_owner_manager.stategovernment, 'state_gov',
+      ifelse(hospitals$HealthFacilities.facility_owner_manager.lga, 'lga_gov',
+                                             'priv_or_religious')))
+
 #subsetting data
 schools <- subset(schools, select=c(lga_id, mylga_zone, mylga_state, mylga, ta_name,
                                     Schools.school_name, Schools.level_of_education,
-                                    Schools.school_managed, Schools.school_managed_other, Schools.ward_name, 
-                                    Schools.ward_num, Schools.com_name, 
-                                    today, X_submission_time.x, X_submission_time.y, start, end))
+                                    Schools.school_managed, Schools.ward_name, 
+                                    Schools.ward_num, Schools.com_name))
 schools <- arrange(schools, mylga_zone, mylga_state, mylga, Schools.level_of_education, Schools.school_managed)
 
 hospitals <- subset(hospitals, select=c(lga_id, mylga_zone, mylga_state, mylga, ta_name,
                                         HealthFacilities.health_facility_name, 
                                         HealthFacilities.health_facility_type,
                                         HealthFacilities.ward_name, HealthFacilities.com_name_h,
-                                        HealthFacilities.facility_owner_manager.federalgovernment, 
-                                        HealthFacilities.facility_owner_manager.stategovernment,
-                                        HealthFacilities.facility_owner_manager.lga, HealthFacilities.facility_owner_manager.other,
-                                        today, X_submission_time.x, 
-                                        X_submission_time.y, start, end))
+                                        managed_by))
 hospitals <- arrange(hospitals, mylga_zone, mylga_state, mylga, HealthFacilities.health_facility_type)
 
 #CLEANING:test/non-character/blank facility names
@@ -173,6 +175,7 @@ print_numbers2("Before name cleaning")
 c_e1 <- schools[which(!str_detect(schools$Schools.school_name, '[a-zA-Z]')),]
 schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
 schools <- subset(schools, !Schools.school_name %in% c("", "1"))
+# TODO: SIMPLIFY
 schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xd5", "")
 schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xd0", "")
 schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\xd2", "")
@@ -192,27 +195,16 @@ hospitals$HealthFacilities.health_facility_name <- str_replace_all(hospitals$Hea
 print_numbers2("After name cleaning")
 
 #CLEANING:duplicates                  
-first_value <- function(df)
-{
-    return(head(df,1))
-}     
 #education
-c_e2 <- subset(schools, duplicated(schools[,1:12]) | duplicated(schools[,1:12], fromLast=T))
-c_e2 <- arrange(c_e2, mylga_zone, mylga_state, mylga, Schools.school_name)  
-schools <- ddply(schools, .(lga_id, mylga_zone, mylga_state, mylga, ta_name, 
-                            Schools.school_name, Schools.level_of_education, Schools.school_managed, 
-                            Schools.school_managed_other, Schools.ward_name, Schools.ward_num, 
-                            Schools.com_name), first_value)                                       
+c_e2 <- subset(schools, duplicated(schools[,1:11]) | duplicated(schools[,1:11], fromLast=T))
+c_e2 <- arrange(c_e2, mylga_zone, mylga_state, mylga, Schools.school_name)
+schools <- subset(schools, !duplicated(schools[,1:11]))
 #health
-c_h2 <- subset(hospitals, duplicated(hospitals[,1:13]) | duplicated(hospitals[,1:13], fromLast=T))
+c_h2 <- subset(hospitals, duplicated(hospitals[,1:10]) | duplicated(hospitals[,1:10], fromLast=T))
 c_h2 <- arrange(c_h2, mylga_zone, mylga_state, mylga, HealthFacilities.health_facility_name)  
-hospitals <- ddply(hospitals, .(lga_id, mylga_zone, mylga_state, mylga, ta_name, 
-                                HealthFacilities.health_facility_name, HealthFacilities.health_facility_type, 
-                                HealthFacilities.ward_name, HealthFacilities.com_name_h, 
-                                HealthFacilities.facility_owner_manager.federalgovernment, 
-                                HealthFacilities.facility_owner_manager.stategovernment, HealthFacilities.facility_owner_manager.lga, 
-                                HealthFacilities.facility_owner_manager.other), first_value)
+hospitals <- subset(hospitals, !duplicated(hospitals[,1:10]))
 print_numbers2("After duplicate cleaning")
+
 
 #ID:random character id
 #education
