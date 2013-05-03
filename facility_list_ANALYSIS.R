@@ -37,7 +37,11 @@ p_index1 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_pr
                      stringsAsFactors=F)
 p_index2 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
                      stringsAsFactors=F)
+<<<<<<< HEAD
 p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_02_11_32_08_p.csv",
+=======
+p_index3 <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_02_11_32_08_p.csv",
+>>>>>>> revised ID function
                      stringsAsFactors=F)
 p_index1 <- p_index1[!(p_index1$mylga==""),]
 p_index3 <- p_index3[!(p_index3$mylga==""),]
@@ -55,7 +59,11 @@ schools1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/i
                          stringsAsFactors=F)
 schools2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
                          stringsAsFactors=F)
+<<<<<<< HEAD
 schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_02_11_32_08_e.csv",
+=======
+schools3_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_02_11_32_08_e.csv",
+>>>>>>> revised ID function
                          stringsAsFactors=F)
 
 # hospitals1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
@@ -65,7 +73,11 @@ hospitals1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning
                            stringsAsFactors=F)
 hospitals2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
                            stringsAsFactors=F)
+<<<<<<< HEAD
 hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_02_11_32_08_h.csv",
+=======
+hospitals3_raw <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_02_11_32_08_h.csv",
+>>>>>>> revised ID function
                            stringsAsFactors=F)
 schools1 <- schools1_raw
 schools2 <- schools2_raw
@@ -226,14 +238,18 @@ print_numbers2("After duplicate cleaning")
 #ID:random character id
 #education
 id_generate <- function(df) { 
-    l <- letters
+#     l <- letters
     set.seed(1)
-    x1 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x2 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x3 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x4 <- l[sample(1:26, dim(df)[1], replace=T)]
-    x5 <- l[sample(1:26, dim(df)[1], replace=T)]
-    df$random_id <- paste0(x1, x2, x3, x4, x5)
+    x <- sample(1:99999, dim(df)[1], replace=F)
+    as.hexmode(x)
+    df$random_id <- as.character(as.hexmode(x))
+#     x1 <- l[sample(1:26, dim(df)[1], replace=T)]
+#     x2 <- l[sample(1:26, dim(df)[1], replace=T)]
+#     x3 <- l[sample(1:26, dim(df)[1], replace=T)]
+#     x4 <- l[sample(1:26, dim(df)[1], replace=T)]
+#     x5 <- l[sample(1:26, dim(df)[1], replace=T)]
+   
+#     df$random_id <- paste0(x1, x2, x3, x4, x5)
     return(df) }    
 schools <- id_generate(schools)
 #This is for tesing if the random_id is unique within each lga
@@ -388,6 +404,25 @@ hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.other"
 hospitals <- rename(hospitals, c("mylga_zone" = "zone"))
 hospitals <- rename(hospitals, c("mylga_state" = "state"))
 hospitals <- rename(hospitals, c("mylga" = "lga"))
+<<<<<<< HEAD
+=======
+
+
++#Name spelling standardization
+names(hospitals)
+
+hospitals <- ward_comm_fix_health_f(hospitals, 'ward', 'community')
+hospitals <- facility_name_fix_health_f(df=hospitals, facility_name_col= 'facility_name')
+
+names(schools)
+
+schools <- ward_comm_fix_edu_f(df=schools, ward_col='ward', comunity_col='community')
+schools <- facility_name_fix_edu_f(df=schools, school_name_col= 'facility_name')
+>>>>>>> revised ID function
+
+
+
+
 
 #writing
 schools <- subset(schools, select=c(-start, -end, -X_submission_time.x, -today,
@@ -406,7 +441,11 @@ write.csv(schools_total, "in_process_data/facility_lists/ossap updates/inprocess
 #######baseline####### 
 ######################
 #education
+<<<<<<< HEAD
 edu <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
+=======
+edu <- read.csv("C:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
+>>>>>>> revised ID function
                 stringsAsFactors=F)
 # edu$public <- !(edu$school_managed %in% c('priv_noprofit', 'priv_noprofit', 'faith_org'))
 # edu <- subset(edu, public == T)
@@ -424,7 +463,11 @@ edu <- rbind.fill(e_113, edu)
 edu <- subset(edu, select=c(X_lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 
 #health
+<<<<<<< HEAD
 health <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
+=======
+health <- read.csv("C:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
+>>>>>>> revised ID function
                    stringsAsFactors=F)
 # health$public <- health$facility_owner_manager.federalgovernment | health$facility_owner_manager.stategovernment |
 #   health$facility_owner_manager.lga
@@ -513,6 +556,21 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     return(df)
 }
 
+<<<<<<< HEAD
+=======
+
+edu <- facility_name_fix_edu_b(df=edu, school_name_col="school_name")
+edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
+
+names(health)
+
+health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
+health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
+
+edu <- id_generate(edu)
+health <- id_generate(health)
+
+>>>>>>> revised ID function
 #writing
 edu <- rename(edu, c("X_lga_id" = "lga_id"))
 edu <- rename(edu, c("school_name" = "facility_name"))
