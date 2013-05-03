@@ -30,14 +30,15 @@ add_lga_id = function(df) {
 ###############################
 ##importing/slicin/dicin data##
 ###############################
-# p_index1 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=1)
-# p_index2 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=1)
-# p_index3 <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=1)
-p_index1 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_p.csv",
+# p_index1 <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=1)
+# p_index2 <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=1)
+# p_index3 <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=1)
+
+p_index1 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_p.csv",
                      stringsAsFactors=F)
-p_index2 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
+p_index2 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
                      stringsAsFactors=F)
-p_index3 <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_p.csv",
+p_index3 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_p.csv",
                      stringsAsFactors=F)
 p_index1 <- p_index1[!(p_index1$mylga==""),]
 p_index3 <- p_index3[!(p_index3$mylga==""),]
@@ -48,25 +49,28 @@ p_index1 <- rename(p_index1, c("X_parent_index" = "X_pindex"))
 p_index2 <- rename(p_index2, c("X_parent_index" = "X_pindex"))
 p_index3 <- rename(p_index3, c("X_parent_index" = "X_pindex"))
 
-# schools1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=2)
-# schools2_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=2)
-# schools3_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=2)
-schools1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_e.csv",
+# schools1_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=2)
+# schools2_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=2)
+# schools3_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=2)
+schools1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_e.csv",
                          stringsAsFactors=F)
-schools2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
+schools2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
                          stringsAsFactors=F)
-schools3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_e.csv",
+schools3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_e.csv",
                          stringsAsFactors=F)
 
-# hospitals1_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
-# hospitals2_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=3)
-# hospitals3_raw <- read.xls("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=3)
-hospitals1_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_h.csv",
+# hospitals1_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
+# hospitals2_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=3)
+# hospitals3_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=3)
+hospitals1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_h.csv",
                            stringsAsFactors=F)
-hospitals2_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
+hospitals2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
                            stringsAsFactors=F)
-hospitals3_raw <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_h.csv",
+hospitals3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_h.csv",
                            stringsAsFactors=F)
+
+# LEAVE the _raw dataframes alone; they are useful for debugging
+# the following dataframes (schools1, .., hospitals1, ..) will be modified in the script
 schools1 <- schools1_raw
 schools2 <- schools2_raw
 schools3 <- schools3_raw
@@ -74,7 +78,7 @@ hospitals1 <- hospitals1_raw
 hospitals2 <- hospitals2_raw
 hospitals3 <- hospitals3_raw
 
-## reading in
+## PRINT NUMBERS IS A USEFUL DEBUGGING FUNCTION -- prints out stuff for all three datasets for schools and hospitals
 print_numbers <- function(where="") {
     print(where)
     print("Number of schools:")
@@ -86,6 +90,7 @@ print_numbers <- function(where="") {
     print("Number of LGAs for health:")
     print(length(levels(factor(c(as.character(hospitals1$mylga), as.character(hospitals2$mylga), as.character(hospitals3$mylga))))))
 }
+## PRINT NUMBERS2 IS A USEFUL DEBUGGING FUNCTION -- prints out stuff for schools hospitals once datasets merged
 print_numbers2 <- function(where="") {
     print(where)
     print("Number of schools:")
@@ -100,7 +105,7 @@ print_numbers2 <- function(where="") {
 
 print_numbers("Just after reading")
 
-# rename child's X_index to uuid
+# simple function to rename a dataframe column
 renameColumn <- function(df, oldname, newname) {
     index = which(names(df) == oldname)
     stopifnot(length(index) <= 1) # assumption: oldname only occurs once
@@ -155,7 +160,7 @@ print_numbers("After cleaning")
 ## joining together
 schools <- rbind.fill(schools1, schools2, schools3)
 hospitals <- rbind.fill(hospitals1, hospitals2, hospitals3)
-print_numbers("After Joining")
+print_numbers2("After Joining")
 
 #subsetting data
 schools <- subset(schools, select=c(lga_id, mylga_zone, mylga_state, mylga, ta_name,
@@ -429,7 +434,7 @@ write.csv(schools_total, "in_process_data/facility_lists/ossap updates/inprocess
 #######baseline####### 
 ######################
 #education
-edu <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
+edu <- read.csv("in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
                 stringsAsFactors=F)
 # edu$public <- !(edu$school_managed %in% c('priv_noprofit', 'priv_noprofit', 'faith_org'))
 # edu <- subset(edu, public == T)
@@ -447,7 +452,7 @@ edu <- rbind.fill(e_113, edu)
 edu <- subset(edu, select=c(X_lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 
 #health
-health <- read.csv("~/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
+health <- read.csv("in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
                    stringsAsFactors=F)
 # health$public <- health$facility_owner_manager.federalgovernment | health$facility_owner_manager.stategovernment |
 #   health$facility_owner_manager.lga
