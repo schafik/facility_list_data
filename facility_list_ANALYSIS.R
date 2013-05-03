@@ -30,16 +30,15 @@ add_lga_id = function(df) {
 ###############################
 ##importing/slicin/dicin data##
 ###############################
-# p_index1 <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=1)
-# p_index2 <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=1)
-# p_index3 <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=1)
 
+# READ IN "p-index" data, and clean it up
 p_index1 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_p.csv",
                      stringsAsFactors=F)
 p_index2 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
                      stringsAsFactors=F)
 p_index3 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_p.csv",
                      stringsAsFactors=F)
+
 p_index1 <- p_index1[!(p_index1$mylga==""),]
 p_index3 <- p_index3[!(p_index3$mylga==""),]
 p_index1 <- add_lga_id(p_index1)
@@ -49,9 +48,7 @@ p_index1 <- rename(p_index1, c("X_parent_index" = "X_pindex"))
 p_index2 <- rename(p_index2, c("X_parent_index" = "X_pindex"))
 p_index3 <- rename(p_index3, c("X_parent_index" = "X_pindex"))
 
-# schools1_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=2)
-# schools2_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=2)
-# schools3_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=2)
+
 schools1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_e.csv",
                          stringsAsFactors=F)
 schools2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
@@ -59,9 +56,6 @@ schools2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityL
 schools3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_03_10_59_04_e.csv",
                          stringsAsFactors=F)
 
-# hospitals1_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_03_09_37_51.xls", sheet=3)   
-# hospitals2_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_03_13_48_46.xls", sheet=3)
-# hospitals3_raw <- read.xls("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_04_10_10_22_06.xls", sheet=3)
 hospitals1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_04_30_10_35_43_h.csv",
                            stringsAsFactors=F)
 hospitals2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
@@ -105,17 +99,9 @@ print_numbers2 <- function(where="") {
 
 print_numbers("Just after reading")
 
-# simple function to rename a dataframe column
-renameColumn <- function(df, oldname, newname) {
-    index = which(names(df) == oldname)
-    stopifnot(length(index) <= 1) # assumption: oldname only occurs once
-    names(df)[index] <- newname
-    df
-}
-
 ## combine with the parent to pull in lga information, etc.
 merge_with_parent <- function(parentDF, childDF) {
-    childDF <- renameColumn(childDF, "X_index", "uuid")
+    childDF <- rename(childDF, c("X_index" = "uuid"))
     merge(parentDF, childDF, by.x = "X_index", by.y="X_parent_index", all.y=T)
 }
 schools1 <- merge_with_parent(p_index1, schools1)
