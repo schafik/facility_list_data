@@ -387,9 +387,8 @@ old_hospitals <- read.csv("in_process_data/facility_lists/FACILITY_LIST_hospital
 
 schools <- rename(schools, c("Schools.school_name" = "facility_name"))
 schools <- rename(schools, c("Schools.level_of_education" = "facility_type"))
-schools <- rename(schools, c("school_managed" = "managed_by"))
+schools <- rename(schools, c("Schools.school_managed" = "managed_by"))
 schools <- rename(schools, c("Schools.ward_num" = "ward"))
-schools <- rename(schools, c("Schools.ward_name" = "ward_name"))
 schools <- rename(schools, c("Schools.com_name" = "community"))
 schools <- rename(schools, c("mylga_zone" = "zone"))
 schools <- rename(schools, c("mylga_state" = "state"))
@@ -398,15 +397,9 @@ hospitals <- rename(hospitals, c("HealthFacilities.health_facility_name" = "faci
 hospitals <- rename(hospitals, c("HealthFacilities.health_facility_type" = "facility_type"))
 hospitals <- rename(hospitals, c("HealthFacilities.ward_name" = "ward"))
 hospitals <- rename(hospitals, c("HealthFacilities.com_name_h" = "community"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.federalgovernment" = "fed_gov"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.stategovernment" = "state_gov"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.lga" = "lga_gov"))
-hospitals <- rename(hospitals, c("HealthFacilities.facility_owner_manager.other" = "private"))
 hospitals <- rename(hospitals, c("mylga_zone" = "zone"))
 hospitals <- rename(hospitals, c("mylga_state" = "state"))
 hospitals <- rename(hospitals, c("mylga" = "lga"))
-<<<<<<< HEAD
-=======
 
 
 +#Name spelling standardization
@@ -419,16 +412,12 @@ names(schools)
 
 schools <- ward_comm_fix_edu_f(df=schools, ward_col='ward', comunity_col='community')
 schools <- facility_name_fix_edu_f(df=schools, school_name_col= 'facility_name')
->>>>>>> revised ID function
-
-
 
 
 
 #writing
-schools <- subset(schools, select=c(-start, -end, -X_submission_time.x, -today,
-                                    -X_submission_time.y, -Schools.school_managed_other, -ta_name))
-hospitals <- subset(hospitals, select=c(-start, -end, -X_submission_time.x, -X_submission_time.y, -ta_name, -today))
+schools <- subset(schools, select=c(-ta_name))
+hospitals <- subset(hospitals, select=c(-ta_name))
 write.csv(schools, "in_process_data/facility_lists/FACILITY_LIST_schools.csv", row.names=F)
 write.csv(hospitals, "in_process_data/facility_lists/FACILITY_LIST_hospitals.csv", row.names=F)
 
@@ -549,8 +538,6 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     return(df)
 }
 
-<<<<<<< HEAD
-=======
 
 edu <- facility_name_fix_edu_b(df=edu, school_name_col="school_name")
 edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
@@ -563,7 +550,6 @@ health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="commu
 edu <- id_generate(edu)
 health <- id_generate(health)
 
->>>>>>> revised ID function
 #writing
 edu <- rename(edu, c("X_lga_id" = "lga_id"))
 edu <- rename(edu, c("school_name" = "facility_name"))
