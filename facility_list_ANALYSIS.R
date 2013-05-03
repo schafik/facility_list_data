@@ -433,40 +433,58 @@ write.csv(schools_total, "in_process_data/facility_lists/ossap updates/inprocess
 #education
 edu <- read.csv("in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
                 stringsAsFactors=F)
-# edu$public <- !(edu$school_managed %in% c('priv_noprofit', 'priv_noprofit', 'faith_org'))
-# edu <- subset(edu, public == T)
+# OUTPUT SHOULD BE 0
+anyDuplicated(edu$uuid)
+
 e_113 <- read.csv("in_process_data/facility_lists/raw data/113/Educ_Baseline_PhaseII_all_merged_cleaned_2011Nov16_without_emptyobs.csv",
                   stringsAsFactors=F)
-# e_113$public <- !(e_113$school_managed_priv_profit == T | e_113$school_managed_priv_noprofit == T)
-e_113$uuid <- e_113$X_id
+e_113 <- subset(e_113, subset=(gps != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
+e_113$uuid <- sapply(paste(e_113$gps, e_113$photo), FUN=digest)
+# OUTPUT SHOULD BE 0
+anyDuplicated(e_113$uuid)
+
+
 e_pilot <- read.csv("in_process_data/facility_lists/raw data/113/Pilot_Education_cleaned_2011Oct4.csv",
                     stringsAsFactors=F)
-# e_pilot$public <- T 
-e_pilot$uuid <- sapply(e_pilot$gps, FUN=digest)
+e_pilot <- subset(e_pilot, subset=(gps != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
+e_pilot$uuid <- sapply(paste(e_pilot$gps, e_pilot$photo), FUN=digest)
+# OUTPUT SHOULD BE 0
+anyDuplicated(e_pilot$uuid)
+
 e_113 <- rbind.fill(e_113, e_pilot)
-# e_113 <- subset(e_113, public==T)
 edu <- rbind.fill(e_113, edu)  
 edu <- subset(edu, select=c(X_lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
+# OUTPUT SHOULD BE 0
+anyDuplicated(edu$uuid)
+
 
 #health
 health <- read.csv("in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
                    stringsAsFactors=F)
-# health$public <- health$facility_owner_manager.federalgovernment | health$facility_owner_manager.stategovernment |
-#   health$facility_owner_manager.lga
-# health <- subset(health, public == T)
+# OUTPUT SHOULD BE 0
+anyDuplicated(health$uuid)
+
 h_113 <- read.csv("in_process_data/facility_lists/raw data/113/Health_PhaseII_RoundI&II&III_Clean_2011.11.16.csv",
                   stringsAsFactors=F)
-# h_113$public <- h_113$facility_owner_manager %in% c('federalgovernment', 'federalgovrenment', 'stategovernment', 'lga')
-# h_113 <- subset(h_113, public==T)
-h_113$uuid <- h_113$X_id 
+h_113 <- subset(h_113, subset=(geocodeoffacility != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
+h_113$uuid <- sapply(paste(h_113$geocodeoffacility, h_113$photo), FUN=digest)
+# THE Following line is dangerous to replicate;  WAS WRITTEN AFTER CAREFUL INSPECTION OF DUPLICATES
+h_113 <- subset(h_113, !duplicated(h_113$uuid))
+# OUTPUT SHOULD BE 0
+anyDuplicated(h_113$uuid)
+
 h_pilot <- read.csv("in_process_data/facility_lists/raw data/113/Pilot_Data_Hlth_Clean_2011.09.02.csv", stringsAsFactors=F)
-# h_pilot$public <- h_pilot$facility_owner_manager %in% c('federalgovrenment', 'stategovernment', 'lga') 
-# h_pilot <- subset(h_pilot, public==T)
-h_pilot$uuid <- sapply(h_pilot$geoid, FUN=digest)
+h_pilot <- subset(h_pilot, subset=(geocodeoffacility != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
+h_pilot$uuid <- sapply(paste(h_pilot$geocodeoffacility, h_pilot$photo), FUN=digest)
+# OUTPUT SHOULD BE 0
+anyDuplicated(h_pilot$uuid)
+
 h_113 <- rbind.fill(h_113, h_pilot)
-# h_113 <- subset(h_113, public==T)
 health <- rbind.fill(h_113, health)  
 health <- subset(health, select=c(X_lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
+
+# OUTPUT SHOULD BE 0
+anyDuplicated(h_pilot$uuid)
 
 ##zaiming cleaning
 #education
@@ -538,12 +556,11 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     return(df)
 }
 
-
+names(edu)
 edu <- facility_name_fix_edu_b(df=edu, school_name_col="school_name")
 edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
 
 names(health)
-
 health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
 health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
 
@@ -553,10 +570,10 @@ health <- id_generate(health)
 #writing
 edu <- rename(edu, c("X_lga_id" = "lga_id"))
 edu <- rename(edu, c("school_name" = "facility_name"))
-edu <- rename(edu, c("uuid" = "random_id"))
+edu <- rename(edu, c("uuid" = "long_id"))
 edu <- rename(edu, c("level_of_education" = "facility_type"))
 health <- rename(health, c("X_lga_id" = "lga_id"))
-health <- rename(health, c("uuid" = "random_id"))
+health <- rename(health, c("uuid" = "long_id"))
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
 
