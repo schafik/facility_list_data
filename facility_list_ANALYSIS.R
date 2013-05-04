@@ -12,6 +12,7 @@ library(plyr)
         set(dt, rows, cols, value) }}
 
 #related data
+# rural_urban <- read.csv("c:/Users/zmyao/Dropbox/Nigeria/Needs Assessment/data/population_Geo.csv")
 rural_urban <- read.csv("~/Dropbox/Nigeria/Needs Assessment/data/population_Geo.csv")
 one48 <- read.csv("148lga_final_list.csv")
 lgas <- read.csv("lgas.csv")
@@ -238,12 +239,26 @@ nrow(schools) - length(unique(schools$long_id))
 
 #ID:random character id
 #education
-id_generate <- function(df) { 
-#     l <- letters
+id_generate <- function(df, prefix) 
+{ 
+#     df <- hospitals
+#     prefix <- "F"
+#     
+    l <- letters
     set.seed(1)
-    x <- sample(1:99999, dim(df)[1], replace=F)
-    as.hexmode(x)
-    df$random_id <- as.character(as.hexmode(x))
+    x <- sample(0:26^4-1, dim(df)[1], replace=F)
+    
+    digits <- vector(mode="list", length=4)
+    tmp <- x
+    for (i in 4:1)
+    {
+        digits[[i]] <- (tmp %% 26) + 1
+        tmp <- tmp %/% 26
+    }
+    df$short_id <- paste0(prefix,':',l[digits[[4]]], l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
+    
+#     as.hexmode(x)
+#     df$random_id <- as.character(as.hexmode(x))
 #     x1 <- l[sample(1:26, dim(df)[1], replace=T)]
 #     x2 <- l[sample(1:26, dim(df)[1], replace=T)]
 #     x3 <- l[sample(1:26, dim(df)[1], replace=T)]
@@ -251,21 +266,22 @@ id_generate <- function(df) {
 #     x5 <- l[sample(1:26, dim(df)[1], replace=T)]
    
 #     df$random_id <- paste0(x1, x2, x3, x4, x5)
-    return(df) }    
-schools <- id_generate(schools)
+    return(df) 
+}    
+schools <- id_generate(schools, "F")
 #This is for tesing if the random_id is unique within each lga
 #If output is "integer(0)" then we're good
 t <- ddply(schools, .(lga_id), summarise, 
-           unique_short_id = length(unique(random_id)), 
-           n_fac = length(random_id))
+           unique_short_id = length(unique(short_id)), 
+           n_fac = length(short_id))
 which(t$unique_short_id != t$n_fac)
 #health
-hospitals <- id_generate(hospitals)
+hospitals <- id_generate(hospitals, "F")
 #This is for tesing if the random_id is unique within each lga
 #If output is "integer(0)" then we're good
 t <- ddply(hospitals, .(lga_id), summarise, 
-           unique_short_id = length(unique(random_id)), 
-           n_fac = length(random_id))
+           unique_short_id = length(unique(short_id)), 
+           n_fac = length(short_id))
 which(t$unique_short_id != t$n_fac)
 
 ##ID:assigning new data from refresh character ID
@@ -402,7 +418,7 @@ hospitals <- rename(hospitals, c("mylga_state" = "state"))
 hospitals <- rename(hospitals, c("mylga" = "lga"))
 
 
-+#Name spelling standardization
+#Name spelling standardization
 names(hospitals)
 
 hospitals <- ward_comm_fix_health_f(hospitals, 'ward', 'community')
@@ -564,8 +580,8 @@ names(health)
 health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
 health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
 
-edu <- id_generate(edu)
-health <- id_generate(health)
+edu <- id_generate(edu, prefix="B")
+health <- id_generate(health, prefix="B")
 
 #writing
 edu <- rename(edu, c("X_lga_id" = "lga_id"))
