@@ -141,14 +141,13 @@ schools <- subset(schools, select=c(lga_id, mylga_zone, mylga_state, mylga, ta_n
                                     Schools.school_name, Schools.level_of_education,
                                     Schools.school_managed, Schools.ward_name, 
                                     Schools.ward_num, Schools.com_name))
-schools <- arrange(schools, mylga_zone, mylga_state, mylga, Schools.level_of_education, Schools.school_managed)
-
+# DON'T ARRANGE: SHORT ID DEPENDS ON ORDER OF INPUT
 hospitals <- subset(hospitals, select=c(lga_id, mylga_zone, mylga_state, mylga, ta_name,
                                         HealthFacilities.health_facility_name, 
                                         HealthFacilities.health_facility_type,
                                         HealthFacilities.ward_name, HealthFacilities.com_name_h,
                                         managed_by))
-hospitals <- arrange(hospitals, mylga_zone, mylga_state, mylga, HealthFacilities.health_facility_type)
+# DON'T ARRANGE: SHORT ID DEPENDS ON ORDER OF INPUT
 
 #CLEANING:test/non-character/blank facility names
 print_numbers2("Before name cleaning")
@@ -158,7 +157,7 @@ cleanweirdchars <- function(df, col) {
   df[,col] <- str_replace_all(df[,col], "\\\\", "/")
   df[,col] <- str_replace_all(df[,col], '"', "'")
   df[,col] <- str_replace_all(df[,col], ",", ";")
-  return(df)
+  df
 }
 
 #education
@@ -236,13 +235,9 @@ nrow(hospitals) - length(unique(hospitals$long_id))
 nrow(schools) - length(unique(schools$long_id)) 
 
 
-#ID:random character id
-#education
-id_generate <- function(df, prefix) 
+#ID:short id, consisting of 4 characters
+shortid_generate <- function(df, prefix) 
 { 
-#     df <- hospitals
-#     prefix <- "F"
-#     
     l <- letters
     set.seed(1)
     x <- sample(0:26^4-1, dim(df)[1], replace=F)
@@ -256,31 +251,19 @@ id_generate <- function(df, prefix)
     }
     df$short_id <- paste0(prefix,':',l[digits[[4]]], l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
     
+    # test that these are unique by lga before returning
+    t <- ddply(df, .(lga_id), summarize,
+                numberofshortids = length(unique(short_id)),
+                numberoffacilities = length(short_id))
+    stopifnot(t$numberofshortids == t$numberoffacilities)
+    
     return(df) 
-}    
-schools <- id_generate(schools, "F")
-#This is for tesing if the random_id is unique within each lga
-#If output is "integer(0)" then we're good
-t <- ddply(schools, .(lga_id), summarise, 
-           unique_short_id = length(unique(short_id)), 
-           n_fac = length(short_id))
-which(t$unique_short_id != t$n_fac)
-#health
-hospitals <- id_generate(hospitals, "F")
-#This is for tesing if the random_id is unique within each lga
-#If output is "integer(0)" then we're good
-t <- ddply(hospitals, .(lga_id), summarise, 
-           unique_short_id = length(unique(short_id)), 
-           n_fac = length(short_id))
-which(t$unique_short_id != t$n_fac)
+}
 
-##ID:assigning new data from refresh character ID
-#reading in facilities that already have ID 
-old_schools <- read.csv("in_process_data/facility_lists/FACILITY_LIST_schools.csv")
-old_hospitals <- read.csv("in_process_data/facility_lists/FACILITY_LIST_hospitals.csv")
-#merge  
-  #... <- merge(old_schools, schools, ....)
-  #... <- merge(old_hospitals, hospitals, ....)
+#education
+schools <- shortid_generate(schools, "F")
+#health
+hospitals <- shortid_generate(hospitals, "F")
 
 ## WRITING OUT ## 
   #zaiming cleaning
@@ -478,7 +461,6 @@ anyDuplicated(health$uuid)
 edu <- rename(edu, c("school_name" = "facility_name", "uuid" = "long_id","level_of_education" = "facility_type"))
 health <- rename(health, c("uuid" = "long_id"))
 
-
 ##zaiming cleaning
 #education
 ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
@@ -492,8 +474,8 @@ ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
-    df[, ward_col] <- cleanweirdchars(df[,ward_col])
-    df[, comunity_col] <- cleanweirdchars([df[,comunity_col]])
+    df <- cleanweirdchars(df,ward_col)
+    df <- cleanweirdchars(df,comunity_col)
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
@@ -513,8 +495,7 @@ facility_name_fix_edu_b <- function(df, school_name_col)
     df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
     df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
     # get rid of / and " from data
-    df[, school_name_col] <- cleanweirdchars(df[,school_name_col])
-    
+    df <- cleanweirdchars(df, school_name_col)
     return(df)
 }
 #health
@@ -529,8 +510,8 @@ ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
-    df[, ward_col] <- cleanweirdchars(df[,ward_col])
-    df[, comunity_col] <- cleanweirdchars([df[,comunity_col]])
+    df <- cleanweirdchars(df,ward_col)
+    df <- cleanweirdchars(df,comunity_col)
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
@@ -556,13 +537,13 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
     df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
     # get rid of / and " from data
-    df[, facility_name_col] <- cleanweirdchars(df[,ward_col])
+    df <- cleanweirdchars(df,facility_name_col)
     
     return(df)
 }
 
-edu <- id_generate(edu, prefix="B")
-health <- id_generate(health, prefix="B")
+edu <- shortid_generate(edu, prefix="B")
+health <- shortid_generate(health, prefix="B")
 
 names(edu)
 edu <- facility_name_fix_edu_b(df=edu, school_name_col="facility_name")
