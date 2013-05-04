@@ -152,30 +152,24 @@ hospitals <- arrange(hospitals, mylga_zone, mylga_state, mylga, HealthFacilities
 
 #CLEANING:test/non-character/blank facility names
 print_numbers2("Before name cleaning")
+
+cleanweirdchars <- function(df, col) {
+  df[,col] <- str_replace_all(df[,col], "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
+  df[,col] <- str_replace_all(df[,col], "\\\\", "/")
+  df[,col] <- str_replace_all(df[,col], '"', "'")
+  df[,col] <- str_replace_all(df[,col], ",", ";")
+  return(df)
+}
+
 #education
 schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
 schools <- subset(schools, !Schools.school_name %in% c(""))
 # TODO: SIMPLIFY
-schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, 
-                                               "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
-schools$Schools.ward_name <- str_replace_all(schools$Schools.ward_name, 
-                                               "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
-schools$Schools.com_name <- str_replace_all(schools$Schools.com_name, 
-                                             "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
-schools$Schools.ward_num <- str_replace_all(schools$Schools.ward_num, 
-                                            "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
 
-schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, "\\\\", "/")
-schools$Schools.ward_name <- str_replace_all(schools$Schools.ward_name, "\\\\", "/")
-schools$Schools.com_name <- str_replace_all(schools$Schools.com_name, "\\\\", "/")
-schools$Schools.ward_num <- str_replace_all(schools$Schools.ward_num, "\\\\", "/")
-
-schools$Schools.school_name <- str_replace_all(schools$Schools.school_name, '"', "'")
-schools$Schools.com_name <- str_replace_all(schools$Schools.com_name, '"', "'")
-schools$Schools.ward_name <- str_replace_all(schools$Schools.ward_name, '"', "'")
-schools$Schools.ward_name <- str_replace_all(schools$Schools.ward_name, 'Ð', "")
-
-schools$Schools.ward_num <- str_replace_all(schools$Schools.ward_num, '"', "'")
+schools <- cleanweirdchars(schools, "Schools.school_name")
+schools <- cleanweirdchars(schools, "Schools.ward_name")
+schools <- cleanweirdchars(schools, "Schools.ward_num")
+schools <- cleanweirdchars(schools, "Schools.com_name")
 
 # MAKE SURE NONE OF THESE GENERATES WARNINGS
 c_e1 <- schools[which(!str_detect(schools$Schools.school_name, '[a-zA-Z]')),]
@@ -189,18 +183,9 @@ hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_na
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "\'\'"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "0000+"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "ˆ +$"),]
-hospitals$HealthFacilities.health_facility_name <- str_replace_all(
-  hospitals$HealthFacilities.health_facility_name, "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
-hospitals$HealthFacilities.ward_name <- str_replace_all(
-  hospitals$HealthFacilities.ward_name, "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
-hospitals$HealthFacilities.com_name_h <- str_replace_all(
-  hospitals$HealthFacilities.com_name_h, "\xd0|\xd1|\xd2|\xd3|\xd4|\xd5|\xe7", "")
-hospitals$HealthFacilities.health_facility_name <- str_replace_all(
-  hospitals$HealthFacilities.health_facility_name, "\\\\", "/")
-hospitals$HealthFacilities.ward_name <- str_replace_all(
-  hospitals$HealthFacilities.ward_name, "\\\\", "/")
-hospitals$HealthFacilities.com_name_h <- str_replace_all(
-  hospitals$HealthFacilities.com_name_h, "\\\\", "/")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.health_facility_name")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.ward_name")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.com_name_h")
 
 # MAKE SURE NONE OF THESE GENERATES WARNINGS
 c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.health_facility_name, '[a-zA-Z]')), ]
