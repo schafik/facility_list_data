@@ -291,15 +291,6 @@ id_generate <- function(df, prefix)
     }
     df$short_id <- paste0(prefix,':',l[digits[[4]]], l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
     
-#     as.hexmode(x)
-#     df$random_id <- as.character(as.hexmode(x))
-#     x1 <- l[sample(1:26, dim(df)[1], replace=T)]
-#     x2 <- l[sample(1:26, dim(df)[1], replace=T)]
-#     x3 <- l[sample(1:26, dim(df)[1], replace=T)]
-#     x4 <- l[sample(1:26, dim(df)[1], replace=T)]
-#     x5 <- l[sample(1:26, dim(df)[1], replace=T)]
-   
-#     df$random_id <- paste0(x1, x2, x3, x4, x5)
     return(df) 
 }    
 schools <- id_generate(schools, "F")
@@ -325,34 +316,6 @@ old_hospitals <- read.csv("in_process_data/facility_lists/FACILITY_LIST_hospital
 #merge  
   #... <- merge(old_schools, schools, ....)
   #... <- merge(old_hospitals, hospitals, ....)
-
-# ##ID:sequential IDs
-# #education
-# #order by lga_id  and submition time
-# schools <- arrange(schools, lga_id, end)
-# #Create serial from 1 to number of records in that lga
-# schools <- ddply(schools, .(lga_id), transform, 
-#                  seq_id = 1:length(lga_id))
-# #adding leading "0"s 
-# idx <- which(sapply(schools$seq_id, nchar) == 1)
-# schools$seq_id[idx] <- paste0("00", schools$seq_id[idx])
-# idx <- which(sapply(schools$seq_id, nchar) == 2)
-# schools$seq_id[idx] <- paste0("0", schools$seq_id[idx])
-# #adding the leading character
-# schools$seq_id <- paste0("FE", schools$seq_id)
-# #health
-# #order by lga_id  and submition time
-# hospitals <- arrange(hospitals, lga_id, end)
-# #Create serial from 1 to number of records in that lga
-# hospitals <- ddply(hospitals, .(lga_id), transform, 
-#                    seq_id = 1:length(lga_id))
-# #adding leading "0"s 
-# idx <- which(sapply(hospitals$seq_id, nchar) == 1)
-# hospitals$seq_id[idx] <- paste0("00", hospitals$seq_id[idx])
-# idx <- which(sapply(hospitals$seq_id, nchar) == 2)
-# hospitals$seq_id[idx] <- paste0("0", hospitals$seq_id[idx])
-# #adding the leading character
-# hospitals$seq_id <- paste0("FH", hospitals$seq_id)
 
 ## WRITING OUT ## 
   #zaiming cleaning
