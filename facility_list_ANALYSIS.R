@@ -510,7 +510,12 @@ health <- rbind.fill(h_113, h_pilot, h_661)
 health <- subset(health, select=c(lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
 
 # OUTPUT SHOULD BE 0
-anyDuplicated(h_pilot$uuid)
+anyDuplicated(health$uuid)
+
+#FINISH RENAME 
+edu <- rename(edu, c("school_name" = "facility_name", "uuid" = "long_id","level_of_education" = "facility_type"))
+health <- rename(health, c("uuid" = "long_id"))
+
 
 ##zaiming cleaning
 #education
@@ -595,27 +600,21 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     # get rid of / and " from data
     df[, facility_name_col] <- str_replace_all(df[,facility_name_col], "\\\\", "/")
     df[, facility_name_col] <- str_replace_all(df[,facility_name_col], '"', "'")
+    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], ',', ";")
     return(df)
 }
 
+edu <- id_generate(edu, prefix="B")
+health <- id_generate(health, prefix="B")
+
 names(edu)
-edu <- facility_name_fix_edu_b(df=edu, school_name_col="school_name")
+edu <- facility_name_fix_edu_b(df=edu, school_name_col="facility_name")
 edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
 
 names(health)
 health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
 health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
 
-edu <- id_generate(edu, prefix="B")
-health <- id_generate(health, prefix="B")
-
-#writing
-edu <- rename(edu, c("X_lga_id" = "lga_id"))
-edu <- rename(edu, c("school_name" = "facility_name"))
-edu <- rename(edu, c("uuid" = "long_id"))
-edu <- rename(edu, c("level_of_education" = "facility_type"))
-health <- rename(health, c("X_lga_id" = "lga_id"))
-health <- rename(health, c("uuid" = "long_id"))
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F, quote=F)
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F, quote=F)
 
