@@ -20,10 +20,11 @@ lgas <- read.csv("lgas.csv")
 ##getting correct lga names/ids##
 lga_corrections <- read.csv('in_process_data/nmis/nmis_lga_corrections.csv', stringsAsFactors=FALSE)
 nmis_lga_mapping <- read.csv('in_process_data/nmis/nmis_lga_mapping.csv', stringsAsFactors=FALSE)
-add_lga_id = function(df) {
-    df$unique_lga <- ifelse(df$mylga %in% c('ERROR', NA),
+add_lga_id = function(df, lga_colname="mylga", state_colname="mylga_state") {
+    df$unique_lga <- tolower(ifelse(df[,lga_colname] %in% c('ERROR', NA),
                             NA,
-                            str_c(df$mylga_state, df$mylga, sep="_"))
+                            str_c(df[,state_colname], df[,lga_colname], sep="_")))
+    df$unique_lga <- str_replace_all(df$unique_lga, " ", "_")
     df$unique_lga <- recodeVar(df$unique_lga, src=lga_corrections$orginal, tgt=lga_corrections$corrected)
     df$lga_id <- as.numeric(recodeVar(as.character(df$unique_lga), src=nmis_lga_mapping$unique_slug, tgt=nmis_lga_mapping$id))
     df
@@ -444,43 +445,54 @@ write.csv(schools_total, "in_process_data/facility_lists/ossap updates/inprocess
 #######baseline####### 
 ######################
 #education
-edu <- read.csv("in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
+e_661 <- read.csv("in_process_data/nmis/Education_661_ALL_FACILITY_INDICATORS.csv",
                 stringsAsFactors=F)
+e_661 <- subset(e_661, select=c(X_lga_id, mylga_zone, mylga_state, mylga, ward, community, school_name, level_of_education, uuid))
+e_661 <- rename(e_661, c("mylga" = "lga", "mylga_state" = "state", "mylga_zone" = "zone", "X_lga_id" = "lga_id"))
 # OUTPUT SHOULD BE 0
-anyDuplicated(edu$uuid)
+anyDuplicated(e_661$uuid)
 
 e_113 <- read.csv("in_process_data/facility_lists/raw data/113/Educ_Baseline_PhaseII_all_merged_cleaned_2011Nov16_without_emptyobs.csv",
                   stringsAsFactors=F)
 e_113 <- subset(e_113, subset=(gps != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
 e_113$uuid <- sapply(paste(e_113$gps, e_113$photo), FUN=digest)
+e_113 <- add_lga_id(e_113, "lga", "state")
+e_113 <- subset(e_113, select=c(lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 # OUTPUT SHOULD BE 0
 anyDuplicated(e_113$uuid)
-
 
 e_pilot <- read.csv("in_process_data/facility_lists/raw data/113/Pilot_Education_cleaned_2011Oct4.csv",
                     stringsAsFactors=F)
 e_pilot <- subset(e_pilot, subset=(gps != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
 e_pilot$uuid <- sapply(paste(e_pilot$gps, e_pilot$photo), FUN=digest)
+e_pilot <- add_lga_id(e_pilot, "lga", "state")
+e_pilot <- subset(e_pilot, select=c(lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 # OUTPUT SHOULD BE 0
 anyDuplicated(e_pilot$uuid)
 
-e_113 <- rbind.fill(e_113, e_pilot)
-edu <- rbind.fill(e_113, edu)  
-edu <- subset(edu, select=c(X_lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
+edu <- rbind.fill(e_113, e_661, e_pilot)  
+edu <- subset(edu, select=c(lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
 # OUTPUT SHOULD BE 0
 anyDuplicated(edu$uuid)
 
 
 #health
-health <- read.csv("in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
+h_661 <- read.csv("in_process_data/nmis/Health_661_ALL_FACILITY_INDICATORS.csv",
                    stringsAsFactors=F)
+h_661 <- subset(h_661, select=c(X_lga_id, mylga_zone, mylga_state, mylga, ward, community, facility_name, facility_type, uuid))
+h_661 <- rename(h_661, c("mylga" = "lga", "mylga_state" = "state", "mylga_zone" = "zone", "X_lga_id" = "lga_id"))
 # OUTPUT SHOULD BE 0
-anyDuplicated(health$uuid)
+anyDuplicated(h_661$uuid)
+
+# OUTPUT SHOULD BE 0
+anyDuplicated(e_113$uuid)
 
 h_113 <- read.csv("in_process_data/facility_lists/raw data/113/Health_PhaseII_RoundI&II&III_Clean_2011.11.16.csv",
                   stringsAsFactors=F)
 h_113 <- subset(h_113, subset=(geocodeoffacility != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
 h_113$uuid <- sapply(paste(h_113$geocodeoffacility, h_113$photo), FUN=digest)
+h_113 <- add_lga_id(h_113, "lga", "state")
+h_113 <- subset(h_113, select=c(lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
 # THE Following line is dangerous to replicate;  WAS WRITTEN AFTER CAREFUL INSPECTION OF DUPLICATES
 h_113 <- subset(h_113, !duplicated(h_113$uuid))
 # OUTPUT SHOULD BE 0
@@ -489,12 +501,13 @@ anyDuplicated(h_113$uuid)
 h_pilot <- read.csv("in_process_data/facility_lists/raw data/113/Pilot_Data_Hlth_Clean_2011.09.02.csv", stringsAsFactors=F)
 h_pilot <- subset(h_pilot, subset=(geocodeoffacility != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
 h_pilot$uuid <- sapply(paste(h_pilot$geocodeoffacility, h_pilot$photo), FUN=digest)
+h_pilot <- add_lga_id(h_pilot, "lga", "state")
+h_pilot <- subset(h_pilot, select=c(lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
 # OUTPUT SHOULD BE 0
 anyDuplicated(h_pilot$uuid)
 
-h_113 <- rbind.fill(h_113, h_pilot)
-health <- rbind.fill(h_113, health)  
-health <- subset(health, select=c(X_lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
+health <- rbind.fill(h_113, h_pilot, h_661)
+health <- subset(health, select=c(lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
 
 # OUTPUT SHOULD BE 0
 anyDuplicated(h_pilot$uuid)
