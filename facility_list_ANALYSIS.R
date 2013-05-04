@@ -115,27 +115,6 @@ hospitals2 <- merge_with_parent(p_index2, hospitals2)
 hospitals3 <- merge_with_parent(p_index3, hospitals3)
 print_numbers("After merging schools and hospitals with parent info")
 
-## dropping non-public facilities
-# drop_private_facilities_edu <- function(df) {
-#   df$public <- df$Schools.school_managed %in% c("fed_gov", "loc_gov", "st_gov")
-#   subsettedDf <- subset(df, public==T)
-#   subsettedDf
-# }
-# schools1 <- drop_private_facilities_edu(schools1)
-# schools2 <- drop_private_facilities_edu(schools2)
-# schools3 <- drop_private_facilities_edu(schools3)
-# drop_private_facilities_health <- function(df) {
-#   df$public <- !(df$HealthFacilities.facility_owner_manager.charitable_ngo ==T |
-#                    df$HealthFacilities.facility_owner_manager.private_forprofit == T |
-#                    df$HealthFacilities.facility_owner_manager.religious_org == T)
-#   df <- subset(df, public == T) 
-#   df
-# }
-# hospitals1 <- drop_private_facilities_health(hospitals1)
-# hospitals2 <- drop_private_facilities_health(hospitals2)
-# hospitals3 <- drop_private_facilities_health(hospitals3)
-# print_numbers("After dropping private schools")
-
 ## cleaning from blank lga information
 schools1 <- subset(schools1, !(mylga == ""))
 schools2 <- subset(schools2, !(mylga == ""))
