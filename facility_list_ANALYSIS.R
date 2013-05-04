@@ -162,35 +162,35 @@ cleanweirdchars <- function(df, col) {
 }
 
 #education
-schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
-schools <- subset(schools, !Schools.school_name %in% c(""))
-# TODO: SIMPLIFY
-
 schools <- cleanweirdchars(schools, "Schools.school_name")
 schools <- cleanweirdchars(schools, "Schools.ward_name")
 schools <- cleanweirdchars(schools, "Schools.ward_num")
 schools <- cleanweirdchars(schools, "Schools.com_name")
+schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
+schools <- subset(schools, !Schools.school_name %in% c("", "1"))
 
-# MAKE SURE NONE OF THESE GENERATES WARNINGS
+# MAKE SURE NONE OF THESE GENERATES WARNINGS -- ideally, they are 0 row dataframes
 c_e1 <- schools[which(!str_detect(schools$Schools.school_name, '[a-zA-Z]')),]
-c_e1 <- schools[which(!str_detect(schools$Schools.ward_name, '[a-zA-Z]')),]
-c_e1 <- schools[which(!str_detect(schools$Schools.com_name, '[a-zA-Z]')),]
-c_e1 <- schools[which(!str_detect(schools$Schools.ward_num, '[a-zA-Z]')),]
+c_e1 <- schools[which(!str_detect(schools$Schools.ward_name, '[a-zA-Z0-9]*')),]
+c_e1 <- schools[which(!str_detect(schools$Schools.com_name, '[a-zA-Z]*')),]
+c_e1 <- schools[which(!str_detect(schools$Schools.ward_num, '[a-zA-Z0-9]*')),]
 
 #health
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.health_facility_name")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.ward_name")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.com_name_h")
+
+# remove facility names that only contain *, ^, or '
 hospitals <- subset(hospitals, !HealthFacilities.health_facility_name %in% c("", "00", "33"))
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, '[*^]'),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "\'\'"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "0000+"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "ˆ +$"),]
-hospitals <- cleanweirdchars(hospitals, "HealthFacilities.health_facility_name")
-hospitals <- cleanweirdchars(hospitals, "HealthFacilities.ward_name")
-hospitals <- cleanweirdchars(hospitals, "HealthFacilities.com_name_h")
 
 # MAKE SURE NONE OF THESE GENERATES WARNINGS
 c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.health_facility_name, '[a-zA-Z]')), ]
-c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.ward_name, '[a-zA-Z]')), ]
-c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.com_name_h, '[a-zA-Z]')), ]
+c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.ward_name, '[a-zA-Z0-9]*')), ]
+c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.com_name_h, '[a-zA-Z]*')), ]
 
 print_numbers2("After name cleaning")
 
@@ -494,12 +494,8 @@ ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
-    df[, ward_col] <- str_replace_all(df[,ward_col], ",", ";")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], ",", ";")
-    df[, ward_col] <- str_replace_all(df[,ward_col], "\\\\", "/")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], "\\\\", "/")
-    df[, ward_col] <- str_replace_all(df[,ward_col], '"', "'")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], '"', "'")
+    df[, ward_col] <- cleanweirdchars(df[,ward_col])
+    df[, comunity_col] <- cleanweirdchars([df[,comunity_col]])
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
@@ -519,9 +515,7 @@ facility_name_fix_edu_b <- function(df, school_name_col)
     df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
     df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
     # get rid of / and " from data
-    df[, school_name_col] <- str_replace_all(df[,school_name_col], "\\\\", "/")
-    df[, school_name_col] <- str_replace_all(df[,school_name_col], '"', "'")
-    df[, school_name_col] <- str_replace_all(df[,school_name_col], ",", ";")
+    df[, school_name_col] <- cleanweirdchars(df[,school_name_col])
     
     return(df)
 }
@@ -537,12 +531,8 @@ ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
-    df[, ward_col] <- str_replace_all(df[,ward_col], "\\\\", "/")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], "\\\\", "/")
-    df[, ward_col] <- str_replace_all(df[,ward_col], '"', "'")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], '"', "'")
-    df[, ward_col] <- str_replace_all(df[,ward_col], ",", ";")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], ",", ";")
+    df[, ward_col] <- cleanweirdchars(df[,ward_col])
+    df[, comunity_col] <- cleanweirdchars([df[,comunity_col]])
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
@@ -568,9 +558,8 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
     df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
     # get rid of / and " from data
-    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], "\\\\", "/")
-    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], '"', "'")
-    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], ',', ";")
+    df[, facility_name_col] <- cleanweirdchars(df[,ward_col])
+    
     return(df)
 }
 
