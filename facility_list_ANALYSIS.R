@@ -162,35 +162,35 @@ cleanweirdchars <- function(df, col) {
 }
 
 #education
-schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
-schools <- subset(schools, !Schools.school_name %in% c(""))
-# TODO: SIMPLIFY
-
 schools <- cleanweirdchars(schools, "Schools.school_name")
 schools <- cleanweirdchars(schools, "Schools.ward_name")
 schools <- cleanweirdchars(schools, "Schools.ward_num")
 schools <- cleanweirdchars(schools, "Schools.com_name")
+schools <- schools[!str_detect(schools$Schools.school_name, '[*]'),]
+schools <- subset(schools, !Schools.school_name %in% c("", "1"))
 
-# MAKE SURE NONE OF THESE GENERATES WARNINGS
+# MAKE SURE NONE OF THESE GENERATES WARNINGS -- ideally, they are 0 row dataframes
 c_e1 <- schools[which(!str_detect(schools$Schools.school_name, '[a-zA-Z]')),]
-c_e1 <- schools[which(!str_detect(schools$Schools.ward_name, '[a-zA-Z]')),]
-c_e1 <- schools[which(!str_detect(schools$Schools.com_name, '[a-zA-Z]')),]
-c_e1 <- schools[which(!str_detect(schools$Schools.ward_num, '[a-zA-Z]')),]
+c_e1 <- schools[which(!str_detect(schools$Schools.ward_name, '[a-zA-Z0-9]*')),]
+c_e1 <- schools[which(!str_detect(schools$Schools.com_name, '[a-zA-Z]*')),]
+c_e1 <- schools[which(!str_detect(schools$Schools.ward_num, '[a-zA-Z0-9]*')),]
 
 #health
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.health_facility_name")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.ward_name")
+hospitals <- cleanweirdchars(hospitals, "HealthFacilities.com_name_h")
+
+# remove facility names that only contain *, ^, or '
 hospitals <- subset(hospitals, !HealthFacilities.health_facility_name %in% c("", "00", "33"))
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, '[*^]'),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "\'\'"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "0000+"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "ˆ +$"),]
-hospitals <- cleanweirdchars(hospitals, "HealthFacilities.health_facility_name")
-hospitals <- cleanweirdchars(hospitals, "HealthFacilities.ward_name")
-hospitals <- cleanweirdchars(hospitals, "HealthFacilities.com_name_h")
 
 # MAKE SURE NONE OF THESE GENERATES WARNINGS
 c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.health_facility_name, '[a-zA-Z]')), ]
-c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.ward_name, '[a-zA-Z]')), ]
-c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.com_name_h, '[a-zA-Z]')), ]
+c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.ward_name, '[a-zA-Z0-9]*')), ]
+c_h1 <- hospitals[which(!str_detect(hospitals$HealthFacilities.com_name_h, '[a-zA-Z]*')), ]
 
 print_numbers2("After name cleaning")
 
@@ -449,8 +449,6 @@ h_661 <- rename(h_661, c("mylga" = "lga", "mylga_state" = "state", "mylga_zone" 
 anyDuplicated(h_661$uuid)
 
 # OUTPUT SHOULD BE 0
-anyDuplicated(e_113$uuid)
-
 h_113 <- read.csv("in_process_data/facility_lists/raw data/113/Health_PhaseII_RoundI&II&III_Clean_2011.11.16.csv",
                   stringsAsFactors=F)
 h_113 <- subset(h_113, subset=(geocodeoffacility != "n/a")) # REMOVING ALL FACILITIES WITHOUT GEO CODE
@@ -494,12 +492,8 @@ ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
-    df[, ward_col] <- str_replace_all(df[,ward_col], ",", ";")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], ",", ";")
-    df[, ward_col] <- str_replace_all(df[,ward_col], "\\\\", "/")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], "\\\\", "/")
-    df[, ward_col] <- str_replace_all(df[,ward_col], '"', "'")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], '"', "'")
+    df[, ward_col] <- cleanweirdchars(df[,ward_col])
+    df[, comunity_col] <- cleanweirdchars([df[,comunity_col]])
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
@@ -519,9 +513,7 @@ facility_name_fix_edu_b <- function(df, school_name_col)
     df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
     df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
     # get rid of / and " from data
-    df[, school_name_col] <- str_replace_all(df[,school_name_col], "\\\\", "/")
-    df[, school_name_col] <- str_replace_all(df[,school_name_col], '"', "'")
-    df[, school_name_col] <- str_replace_all(df[,school_name_col], ",", ";")
+    df[, school_name_col] <- cleanweirdchars(df[,school_name_col])
     
     return(df)
 }
@@ -537,12 +529,8 @@ ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
-    df[, ward_col] <- str_replace_all(df[,ward_col], "\\\\", "/")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], "\\\\", "/")
-    df[, ward_col] <- str_replace_all(df[,ward_col], '"', "'")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], '"', "'")
-    df[, ward_col] <- str_replace_all(df[,ward_col], ",", ";")
-    df[, comunity_col] <- str_replace_all(df[,comunity_col], ",", ";")
+    df[, ward_col] <- cleanweirdchars(df[,ward_col])
+    df[, comunity_col] <- cleanweirdchars([df[,comunity_col]])
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
@@ -568,9 +556,8 @@ facility_name_fix_health_b <- function(df, facility_name_col)
     df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
     df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
     # get rid of / and " from data
-    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], "\\\\", "/")
-    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], '"', "'")
-    df[, facility_name_col] <- str_replace_all(df[,facility_name_col], ',', ";")
+    df[, facility_name_col] <- cleanweirdchars(df[,ward_col])
+    
     return(df)
 }
 
@@ -629,43 +616,3 @@ ggplot(data=schools_agg, aes(x=baseline_facilitiy_count, y=facility_counts, labe
     geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Education", x = "NMIS", y="Facility lists") + stat_smooth(method="lm")
 ggplot(data=hospitals_agg, aes(x=base_line_faciliti_count, y=facility_counts, label=lga)) +  
     geom_point(position="jitter") + geom_abline(intercept=0, slope=1) + labs(title = "Health", x = "NMIS", y="Facility Lists") + stat_smooth(method="lm")
-
-################
-####more outputs
-################
-# #TA names
-# lists <- formhubDownload("NMIS_FacilityLists_for_CoverageAnalysis", "technical_assistant", "sc4l3up!")@data
-# lists2 <- formhubDownload("NMIS_FacilityLists_for_CoverageAnalysis_2", "technical_assistant", "sc4l3up!")@data
-# l <- rbind.fill(lists, lists2)
-# l <- subset(l, select=c(mylga_zone, mylga_state, mylga, ta_name))
-# 
-# ta_names <- l[!duplicated(l$ta_name),]
-# ta_names <- ta_names[!is.na(ta_names$mylga),]
-# clean(ta_names, 'ta_name', 
-#       which(ta_names$ta_name %in% c('Akima Edet', 'Edet Akima', 
-#                                     'Nanle Dalu', 'TERESA O. PATRICK', 'TEGA DAVID  AYUYA', 'jonah michael',
-#                                     'KABIRU SAMAILA', 'okeatyo oluwafemi', 'oketayo oluwfemi',
-#                                     'Engr. Mai modu', 'Engr  Idris Abdullahi', 'DANLAMI BALA GWAMAJA',
-#                                     'DANLAMI BALA GWAMMAJA', 'Engr.Abba A. Yusuf', 'FOLORUNSO,Mark E.O.', 
-#                                     'Ahmed Sarkin Zamfara', 'AHMED IBRAHIM MUHD', 'Ahmed S. Zamfara Zurmi',
-#                                     'YAHAYA  JIBRIL', 'FOLORUNSO MARK E.O.', 'Engr Abba A. Yusuf', 
-#                                     'OLOLADE DANMOLA ADELEKAN', 'YAHAYAJIBRIL', 'TEGA DAVID AYUYA', 
-#                                     'FOLORUNSO, MARK E.O.', 'ADESINA ADEJARE RASHEED', 'Adeleke  Kamoru Adedoja',
-#                                     'AHMAD S/ZAMFARA', 'OLOLADE DANMOLA-ADELEKAN', 'Adeleke kamoru Adedoja', 
-#                                     'FOLORUNSO Mark.E.O.', 'FOLRUNSO, Mark E.O.', 'YUSUF H. OLUWATOSIN',
-#                                     'Onyeiwu Leonard C.', 'OGIDIGA LAWSON OKPOEGERI', 'OGIDIGA LAWSON OKPOEGEBRI',
-#                                     'KABIRU SAMAIAL', 'JONAH MICHAEL', 'Engr Idris  Abdullahi', 'DANALAMI BALA GWAMMAJA'
-#       )), NA)
-# ta_names <- ta_names[!is.na(ta_names$ta_name),]
-# ta_names <- ta_names[!duplicated(ta_names$mylga),]
-# ta_names <- ta_names[,c(1,4)]
-# ta_names <- arrange(ta_names, mylga_zone)
-# ta_names$ta_name <- toupper(as.character(ta_names$ta_name))
-# write.csv(ta_names, "presentations/mop_up/TA_names.csv", row.names=F)
-# 
-# paste("Number of TAs that have submitted facility lists:", length(ta_names$mylga) )
-# paste("Number of LGAs that have submitted facility lists:", nrow(schools_agg))
-# paste("Number of Education facility lists with at least the number of facilities as baseline:", 
-#       nrow(subset(schools_agg, facility_counts > baseLine_total)))
-# paste("Number of Health facility lists with at least the number of facilities as baseline:", 
-#       nrow(subset(hospitals_agg, facility_counts > base_line_faciliti_count)))
