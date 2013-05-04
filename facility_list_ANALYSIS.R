@@ -530,6 +530,8 @@ ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
     df[, ward_col] <- str_trim(df[, ward_col])
     df[, comunity_col] <- str_trim(df[, comunity_col])
     # get rid of / and " from data
+    df[, ward_col] <- str_replace_all(df[,ward_col], ",", ";")
+    df[, comunity_col] <- str_replace_all(df[,comunity_col], ",", ";")
     df[, ward_col] <- str_replace_all(df[,ward_col], "\\\\", "/")
     df[, comunity_col] <- str_replace_all(df[,comunity_col], "\\\\", "/")
     df[, ward_col] <- str_replace_all(df[,ward_col], '"', "'")
@@ -555,6 +557,8 @@ facility_name_fix_edu_b <- function(df, school_name_col)
     # get rid of / and " from data
     df[, school_name_col] <- str_replace_all(df[,school_name_col], "\\\\", "/")
     df[, school_name_col] <- str_replace_all(df[,school_name_col], '"', "'")
+    df[, school_name_col] <- str_replace_all(df[,school_name_col], ",", ";")
+    
     return(df)
 }
 #health
@@ -573,6 +577,8 @@ ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
     df[, comunity_col] <- str_replace_all(df[,comunity_col], "\\\\", "/")
     df[, ward_col] <- str_replace_all(df[,ward_col], '"', "'")
     df[, comunity_col] <- str_replace_all(df[,comunity_col], '"', "'")
+    df[, ward_col] <- str_replace_all(df[,ward_col], ",", ";")
+    df[, comunity_col] <- str_replace_all(df[,comunity_col], ",", ";")
     # trim off "0" in front of 01,02 & etc
     df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
     # replace consecutive blanks with only one blank
