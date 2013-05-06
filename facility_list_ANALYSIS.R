@@ -264,7 +264,7 @@ shortid_generate <- function(df, prefix)
 schools <- shortid_generate(schools, 'F')
 
 #health
-hospitals <- shortid_generate(hospitals, 'F'))
+hospitals <- shortid_generate(hospitals, 'F')
 
 
 ## WRITING OUT ## 
