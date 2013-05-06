@@ -241,16 +241,16 @@ shortid_generate <- function(df, prefix)
 { 
     l <- letters
     set.seed(1)
-    x <- sample(0:26^3-1, dim(df)[1], replace=F)
+    x <- sample(0:26^4-1, dim(df)[1], replace=F)
     
-    digits <- vector(mode="list", length=3)
+    digits <- vector(mode="list", length=4)
     tmp <- x
-    for (i in 3:1)
+    for (i in 4:1)
     {
         digits[[i]] <- (tmp %% 26) + 1
         tmp <- tmp %/% 26
     }
-    df$short_id <- paste0(prefix,':', l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
+    df$short_id <- paste0(prefix,':', l[digits[[4]]],l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
     
     # test that these are unique by lga before returning
     numberofshortids <- length(unique(df$short_id))
@@ -261,10 +261,10 @@ shortid_generate <- function(df, prefix)
 }
 
 #education
-schools <- ddply(schools, .(lga_id), function(x) shortid_generate(x, 'F'))
+schools <- shortid_generate(schools, 'F')
 
 #health
-hospitals <- ddply(hospitals, .(lga_id), function(x) shortid_generate(x, 'F'))
+hospitals <- shortid_generate(hospitals, 'F'))
 
 
 ## WRITING OUT ## 
@@ -455,9 +455,9 @@ health <- rename(health, c("uuid" = "long_id"))
 #####
 #####
 
-edu <- ddply(edu, .(lga_id), function(x) shortid_generate(x, 'B'))
+edu <- shortid_generate(edu, 'B')
 
-health <- ddply(health, .(lga_id), function(x) shortid_generate(x, 'B'))
+health <- shortid_generate(health, 'B')
 
 #names(edu)
 edu <- facility_name_fix_FBe(df=edu, school_name_col="facility_name")
