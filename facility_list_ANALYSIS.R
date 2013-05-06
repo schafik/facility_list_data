@@ -181,7 +181,7 @@ hospitals <- cleanweirdchars(hospitals, "HealthFacilities.com_name_h")
 
 # remove facility names that only contain *, ^, or '
 hospitals <- subset(hospitals, !HealthFacilities.health_facility_name %in% c("", "00", "33"))
-hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, '[*^]'),]
+hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, '^[ *^]*$'),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "\'\'"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "0000+"),]
 hospitals <- hospitals[!str_detect(hospitals$HealthFacilities.health_facility_name, "ˆ +$"),]
@@ -235,116 +235,108 @@ nrow(hospitals) - length(unique(hospitals$long_id))
 nrow(schools) - length(unique(schools$long_id)) 
 
 
-#ID:short id, consisting of 4 characters
+#ID:short id, consisting of 3 characters
+# Tested: ddply won't messed up with the chronological sequence of records, and the rng will spits identical numbers if we keep fix seed 
 shortid_generate <- function(df, prefix) 
 { 
     l <- letters
     set.seed(1)
-    x <- sample(0:26^4-1, dim(df)[1], replace=F)
+    x <- sample(0:26^3-1, dim(df)[1], replace=F)
     
-    digits <- vector(mode="list", length=4)
+    digits <- vector(mode="list", length=3)
     tmp <- x
-    for (i in 4:1)
+    for (i in 3:1)
     {
         digits[[i]] <- (tmp %% 26) + 1
         tmp <- tmp %/% 26
     }
-    df$short_id <- paste0(prefix,':',l[digits[[4]]], l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
+    df$short_id <- paste0(prefix,':', l[digits[[3]]],l[digits[[2]]],l[digits[[1]]])
     
     # test that these are unique by lga before returning
-    t <- ddply(df, .(lga_id), summarize,
-                numberofshortids = length(unique(short_id)),
-                numberoffacilities = length(short_id))
-    stopifnot(t$numberofshortids == t$numberoffacilities)
+    numberofshortids <- length(unique(df$short_id))
+    numberoffacilities <- length(df$short_id)
+    stopifnot(numberofshortids == numberoffacilities)
     
     return(df) 
 }
 
 #education
-schools <- shortid_generate(schools, "F")
+schools <- ddply(schools, .(lga_id), function(x) shortid_generate(x, 'F'))
+
 #health
-hospitals <- shortid_generate(hospitals, "F")
+hospitals <- ddply(hospitals, .(lga_id), function(x) shortid_generate(x, 'F'))
+
 
 ## WRITING OUT ## 
-  #zaiming cleaning
-    #education
-    index <- which(is.na(schools$Schools.ward_num) & !is.na(schools$Schools.ward_name))
-    schools$Schools.ward_num[index] <- schools$Schools.ward_name[index]
-    rm(index)
-    schools$Schools.ward_name <- NULL
+#zaiming cleaning
+#education
+index <- which(is.na(schools$Schools.ward_num) & !is.na(schools$Schools.ward_name))
+schools$Schools.ward_num[index] <- schools$Schools.ward_name[index]
+rm(index)
+schools$Schools.ward_name <- NULL
     
-    ward_comm_fix_edu_f <- function(df, ward_col, comunity_col)
-    {
-        #    ward_col <- "Schools.ward_num"
-        #    comunity_col <- "Schools.com_name"
-        #    df <- schools
-        # Take out "ward"
-        df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
-        # trim off leading & tailing blanks
-        df[, ward_col] <- str_trim(df[, ward_col])
-        df[, comunity_col] <- str_trim(df[, comunity_col])
-        # trim off "0" in front of 01,02 & etc
-        df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
-        # replace consecutive blanks with only one blank
-        df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
-        df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-        return(df)
-    } 
-    facility_name_fix_edu_f <- function(df, school_name_col)
-    {
-        #     df <- schools
-        #     school_name_col <- "Schools.school_name" 
-        df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
-        df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
-        return(df)
-    }
-    #health 
-    ward_comm_fix_health_f <- function(df, ward_col, comunity_col)
-    {
-        #ward_col <- "HealthFacilities.ward_name"
-        #comunity_col <- "HealthFacilities.com_name_h"
-        #df <- hospitals
-        # Take out "ward"
-        df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
-        # find row.name for those com == NA & ward contain (",", "/")
-        idx <- which(is.na(df[, comunity_col]) & str_detect(df[, ward_col], '[/,]') )
-        # replace comm with string after "/"
-        df[idx, comunity_col] <- str_trim(str_replace(df[idx,ward_col], '[a-zA-Z0-9 \')]+[/,]', ""))
-        # replace war with string before "/"
-        df[idx, ward_col] <- str_trim(str_replace(str_extract(df[idx, ward_col], '[a-zA-Z0-9 \')]+[/,]'), "[/,]$", ""))
-        # trim off leading & tailing blanks
-        df[, ward_col] <- str_trim(df[, ward_col])
-        # trim off "0" in front of 01,02 & etc
-        df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
-        # replace consecutive blanks with only one blank
-        df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
-        df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-        return(df)
-    } 
-    facility_name_fix_health_f <- function(df, facility_name_col)
-    {
-        #    df <- hospitals
-        #    facility_name_col <- "HealthFacilities.health_facility_name"  
-        df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
-        df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
-        return(df)
-    }
+ward_comm_fix_FBe_Bh <- function(df, ward_col, comunity_col)
+{
+    # Take out "ward"
+    df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
+    # trim off leading & tailing blanks
+    df[, ward_col] <- str_trim(df[, ward_col])
+    df[, comunity_col] <- str_trim(df[, comunity_col])
+    # trim off "0" in front of 01,02 & etc
+    df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
+    # replace consecutive blanks with only one blank
+    df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
+    df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
+    return(df)
+} 
+facility_name_fix_FBe <- function(df, school_name_col)
+{
+    df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
+    df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
+    return(df)
+}
+#health 
+ward_comm_fix_Fh <- function(df, ward_col, comunity_col)
+{
+    # Take out "ward"
+    df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
+    # find row.name for those com == NA & ward contain (",", "/")
+    idx <- which(is.na(df[, comunity_col]) & str_detect(df[, ward_col], '[/,]') )
+    # replace comm with string after "/"
+    df[idx, comunity_col] <- str_trim(str_replace(df[idx,ward_col], '[a-zA-Z0-9 \')]+[/,]', ""))
+    # replace war with string before "/"
+    df[idx, ward_col] <- str_trim(str_replace(str_extract(df[idx, ward_col], '[a-zA-Z0-9 \')]+[/,]'), "[/,]$", ""))
+    # trim off leading & tailing blanks
+    df[, ward_col] <- str_trim(df[, ward_col])
+    # trim off "0" in front of 01,02 & etc
+    df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
+    # replace consecutive blanks with only one blank
+    df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
+    df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
+    return(df)
+} 
+facility_name_fix_FBh <- function(df, facility_name_col)
+{
+    df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
+    df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
+    return(df)
+}
 
 schools <- rename(schools, c("Schools.school_name" = "facility_name"))
 schools <- rename(schools, c("Schools.level_of_education" = "facility_type"))
@@ -364,15 +356,12 @@ hospitals <- rename(hospitals, c("mylga" = "lga"))
 
 
 #Name spelling standardization
-names(hospitals)
+hospitals <- ward_comm_fix_Fh(hospitals, 'ward', 'community')
+hospitals <- facility_name_fix_FBh(df=hospitals, facility_name_col= 'facility_name')
 
-hospitals <- ward_comm_fix_health_f(hospitals, 'ward', 'community')
-hospitals <- facility_name_fix_health_f(df=hospitals, facility_name_col= 'facility_name')
 
-names(schools)
-
-schools <- ward_comm_fix_edu_f(df=schools, ward_col='ward', comunity_col='community')
-schools <- facility_name_fix_edu_f(df=schools, school_name_col= 'facility_name')
+schools <- ward_comm_fix_FBe_Bh(df=schools, ward_col='ward', comunity_col='community')
+schools <- facility_name_fix_FBe(df=schools, school_name_col= 'facility_name')
 
 
 
@@ -462,96 +451,21 @@ edu <- rename(edu, c("school_name" = "facility_name", "uuid" = "long_id","level_
 health <- rename(health, c("uuid" = "long_id"))
 
 ##zaiming cleaning
-#education
-ward_comm_fix_edu_b <- function(df, ward_col, comunity_col)
-{
-    #ward_col <- "ward"
-    #comunity_col <- "community"
-    #df <- edu   
-    # Take out "ward"
-    df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
-    # trim off leading & tailing blanks
-    df[, ward_col] <- str_trim(df[, ward_col])
-    df[, comunity_col] <- str_trim(df[, comunity_col])
-    # get rid of / and " from data
-    df <- cleanweirdchars(df,ward_col)
-    df <- cleanweirdchars(df,comunity_col)
-    # trim off "0" in front of 01,02 & etc
-    df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
-    # replace consecutive blanks with only one blank
-    df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
-    df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-    return(df)
-} 
-facility_name_fix_edu_b <- function(df, school_name_col)
-{
-#     df <- edu
-#     school_name_col <- "school_name"     
-    df[, school_name_col] <- gsub('comm(\\.| )|comm$',  "Community ", df[, school_name_col], ignore.case=T)
-    df[, school_name_col] <- gsub('(sch(\\.| )|sch$)',  "School ", df[, school_name_col], ignore.case=T)
-    df[, school_name_col] <- gsub('(sec(\\.| )|sec$)',  "Secondary ", df[, school_name_col], ignore.case=T)
-    df[, school_name_col] <- gsub('snr(\\.| )|snr$|snr)',  "Senior ", df[, school_name_col], ignore.case=T)
-    df[, school_name_col] <- gsub('(nur/(pri|pry)(.|$))|N/P(\\.| |$)',  "Nursery/Primary ", df[, school_name_col], ignore.case=T)
-    df[, school_name_col] <- gsub('(pri|pry|prim)(\\.| )',  "Primary ", df[, school_name_col], ignore.case=T)
-    df[, school_name_col] <- gsub('jnr',  "Junior ", df[, school_name_col], ignore.case=T)
-    # get rid of / and " from data
-    df <- cleanweirdchars(df, school_name_col)
-    return(df)
-}
-#health
-ward_comm_fix_health_b <- function(df, ward_col, comunity_col)
-{
-#     ward_col <- "ward"
-#     comunity_col <- "community"
-#     df <- health
-    # Take out "ward"
-    df[,ward_col] <- str_replace(df[,ward_col], ignore.case("ward"), "")
-    # trim off leading & tailing blanks
-    df[, ward_col] <- str_trim(df[, ward_col])
-    df[, comunity_col] <- str_trim(df[, comunity_col])
-    # get rid of / and " from data
-    df <- cleanweirdchars(df,ward_col)
-    df <- cleanweirdchars(df,comunity_col)
-    # trim off "0" in front of 01,02 & etc
-    df[which(str_detect(df[, ward_col], '^[0-9]+$')), ward_col] <- str_replace(df[which(str_detect(df[,ward_col], '^[0-9]+$')), ward_col], "^0+", "")
-    # replace consecutive blanks with only one blank
-    df[,ward_col] <- gsub('  +', " ", df[,ward_col], ignore.case=T)
-    df[,comunity_col] <- gsub('  +', " ", df[,comunity_col], ignore.case=T)
-    return(df)
-} 
-facility_name_fix_health_b <- function(df, facility_name_col)
-{
-#     df <- health
-#     facility_name_col <- "facility_name"     
-    df[,facility_name_col] <- sub('pry.+health.|PRI.+HEALTH',  "Primary Health ", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('center', "Centre", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('B(\\.| )H(\\.| )C\\.|BHC', "Basic Health Centre", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('P.H.C.+(clinic|centre)|PHC.+(clinic|centre)', "PHCC", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('p h c c', "PHCC ", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('P(\\.| )H(\\.| )C\\.|pri.+Health.centre', "PHC", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('(H/(P|post)|health post|HP)', "Health Post", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('hosp\\.', "Hospital", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('/mat(\\.| |)', "/Maternity ", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('hosp/', "Hospital/ ", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('gen(\\.| )', "General ", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('comp(\\.| )', "Comprehensive ", df[, facility_name_col], ignore.case=T)
-    df[, facility_name_col] <- sub('h/c |h/c$', "HC ", df[, facility_name_col], ignore.case=T)
-    # get rid of / and " from data
-    df <- cleanweirdchars(df,facility_name_col)
-    
-    return(df)
-}
+#####
+#####
+#####
 
-edu <- shortid_generate(edu, prefix="B")
-health <- shortid_generate(health, prefix="B")
+edu <- ddply(edu, .(lga_id), function(x) shortid_generate(x, 'B'))
 
-names(edu)
-edu <- facility_name_fix_edu_b(df=edu, school_name_col="facility_name")
-edu <- ward_comm_fix_edu_b(df=edu, ward_col="ward", comunity_col="community")
+health <- ddply(health, .(lga_id), function(x) shortid_generate(x, 'B'))
 
-names(health)
-health <- facility_name_fix_health_b(df=health, facility_name_col="facility_name")
-health <- ward_comm_fix_health_b(df=health, ward_col="ward", comunity_col="community")
+#names(edu)
+edu <- facility_name_fix_FBe(df=edu, school_name_col="facility_name")
+edu <- ward_comm_fix_FBe_Bh(df=edu, ward_col="ward", comunity_col="community")
+
+#names(health)
+health <- facility_name_fix_FBh(df=health, facility_name_col="facility_name")
+health <- ward_comm_fix_FBe_Bh(df=health, ward_col="ward", comunity_col="community")
 
 write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F, quote=F)
 write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F, quote=F)
