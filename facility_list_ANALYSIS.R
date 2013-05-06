@@ -408,6 +408,7 @@ anyDuplicated(e_pilot$uuid)
 
 edu <- rbind.fill(e_113, e_661, e_pilot)  
 edu <- subset(edu, select=c(lga_id, zone, state, lga, ward, community, school_name, level_of_education, uuid))
+edu <- cleanweirdchars(cleanweirdchars(cleanweirdchars(edu, 'community'), 'school_name'), 'ward')
 # OUTPUT SHOULD BE 0
 anyDuplicated(edu$uuid)
 
@@ -442,6 +443,7 @@ anyDuplicated(h_pilot$uuid)
 
 health <- rbind.fill(h_113, h_pilot, h_661)
 health <- subset(health, select=c(lga_id, zone, state, lga, ward, community, facility_name, facility_type, uuid))
+health <- cleanweirdchars(cleanweirdchars(cleanweirdchars(health, 'community'), 'facility_name'), 'ward')
 
 # OUTPUT SHOULD BE 0
 anyDuplicated(health$uuid)
