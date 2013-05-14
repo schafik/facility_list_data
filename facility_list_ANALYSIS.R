@@ -34,11 +34,11 @@ add_lga_id = function(df, lga_colname="mylga", state_colname="mylga_state") {
 ###############################
 
 # READ IN "p-index" data, and clean it up
-p_index1 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_07_12_44_22_p.csv",
+p_index1 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_14_14_28_44_p.csv",
                      stringsAsFactors=F)
 p_index2 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
                      stringsAsFactors=F)
-p_index3 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_13_15_04_09_p.csv",
+p_index3 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_14_11_58_47_p.csv",
                      stringsAsFactors=F)
 
 p_index1 <- p_index1[!(p_index1$mylga==""),]
@@ -51,18 +51,18 @@ p_index2 <- rename(p_index2, c("X_parent_index" = "X_pindex"))
 p_index3 <- rename(p_index3, c("X_parent_index" = "X_pindex"))
 
 
-schools1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_07_12_44_22_e.csv",
+schools1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_14_14_28_44_e.csv",
                          stringsAsFactors=F)
 schools2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
                          stringsAsFactors=F)
-schools3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_13_15_04_09_e.csv",
+schools3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_14_11_58_47_e.csv",
                          stringsAsFactors=F)
 
-hospitals1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_07_12_44_22_h.csv",
+hospitals1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_14_14_28_44_h.csv",
                            stringsAsFactors=F)
 hospitals2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
                            stringsAsFactors=F)
-hospitals3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_13_15_04_09_h.csv",
+hospitals3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_14_11_58_47_h.csv",
                            stringsAsFactors=F)
 
 # LEAVE the _raw dataframes alone; they are useful for debugging
