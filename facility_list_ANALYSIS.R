@@ -157,6 +157,7 @@ cleanweirdchars <- function(df, col) {
   df[,col] <- str_replace_all(df[,col], "\\\\", "/")
   df[,col] <- str_replace_all(df[,col], '"', "'")
   df[,col] <- str_replace_all(df[,col], ",", ";")
+  df[,col] <- str_replace_all(df[,col], "\n", "")
   df
 }
 
@@ -469,8 +470,8 @@ edu <- ward_comm_fix_FBe_Bh(df=edu, ward_col="ward", comunity_col="community")
 health <- facility_name_fix_FBh(df=health, facility_name_col="facility_name")
 health <- ward_comm_fix_FBe_Bh(df=health, ward_col="ward", comunity_col="community")
 
-write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F, quote=F)
-write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F, quote=F)
+write.csv(edu, "in_process_data/facility_lists/BASELINE_schools.csv", row.names=F)
+write.csv(health, "in_process_data/facility_lists/BASELINE_hospitals.csv", row.names=F)
 
 ## AGGREGATION BY LGA: baseline
 h_total <- ddply(health, .(lga_id), nrow)
