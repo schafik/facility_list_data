@@ -1,3 +1,4 @@
+setwd('c:/Users/zmyao/Dropbox/Nigeria/Nigeria 661 Baseline Data Cleaning/')
 require(stringr)
 
 nc <- read.csv('./in_process_data/facility_lists/Data Matcher/back check/education_nc.csv')
@@ -29,10 +30,14 @@ ta_list$ta_name <- trim(ta_list$ta_name)
 #add column that checks if the TA's is being checked
 ta_list$checked <- ta_list$ta_name %in% checked_list
 
+# If output == 0 then there's no spelling mistake in names
 checked_list[which(!(checked_list %in% ta_list$ta_name))]
-checked_list[order(as.character(checked_list))]
+#checked_list[order(as.character(checked_list))]
 
 
 
 write.csv(ta_list, './in_process_data/facility_lists/ta_list_checked.csv', row.names=F)
 
+
+unique(ta_list$ta_name)
+unique(ta_list[(ta_list$checked == F),]$ta_name)
