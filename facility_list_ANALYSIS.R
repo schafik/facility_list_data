@@ -38,7 +38,7 @@ p_index1 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists
                      stringsAsFactors=F)
 p_index2 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_p.csv",
                      stringsAsFactors=F)
-p_index3 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_28_11_14_12_p.csv",
+p_index3 <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_06_07_17_32_01_p.csv",
                      stringsAsFactors=F)
 
 p_index1 <- p_index1[!(p_index1$mylga==""),]
@@ -55,14 +55,14 @@ schools1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityL
                          stringsAsFactors=F)
 schools2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_e.csv",
                          stringsAsFactors=F)
-schools3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_28_11_14_12_e.csv",
+schools3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_06_07_17_32_01_e.csv",
                          stringsAsFactors=F)
 
 hospitals1_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2013_05_14_14_28_44_h.csv",
                            stringsAsFactors=F)
 hospitals2_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_2_2013_04_29_06_14_15_h.csv",
                            stringsAsFactors=F)
-hospitals3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_05_28_11_14_12_h.csv",
+hospitals3_raw <- read.csv("in_process_data/facility_lists/raw data/NMIS_FacilityLists_for_CoverageAnalysis_3_2013_06_07_17_32_01_h.csv",
                            stringsAsFactors=F)
 
 # LEAVE the _raw dataframes alone; they are useful for debugging
